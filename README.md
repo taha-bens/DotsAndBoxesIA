@@ -1,5 +1,9 @@
 # DotsAndBoxes
 
+**Dots and Boxes** (ou ***Pipopipette***) est un jeu de stratégie inventé à la fin du XIX-ème siècle par des étudiants/mathématiciens français. Le principe est très simple : les cases d'une grille générée aléatoirement sont disputées par deux joueurs (traditionnellement, mais on peut jouer à autant qu'on veut pourvu que la grille soit assez grande). Ils posent chacun leur tour un mur sur la grille, et gagnent une case lorsqu'ils parviennent à placer le dernier de ses quatres murs. Le joueur ayant obtenu le plus de cases gagne la partie.
+
+## Getting started :
+
 #### Installer OPAM, OCaml et Dune  :
 
 ```shell
