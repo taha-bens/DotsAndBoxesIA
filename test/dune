@@ -1,3 +1,3 @@
 (test
 	(name main_test)
-	(libraries ounit2))
+	(libraries ounit2 dnb.lib))
