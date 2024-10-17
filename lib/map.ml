@@ -47,7 +47,7 @@ let random_map w h =
   {width=w; height=h; content=return}
 
 let perlin_map w h =
-  let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h) in
+  let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
   for i = 0 to h-1 do
     for j = 0 to w-1 do
       if return.(i).(j).content = -1 then 

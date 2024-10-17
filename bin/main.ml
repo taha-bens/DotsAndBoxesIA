@@ -1,3 +1,3 @@
 open Dnb.Map
 
-let () = print_map (perlin_map 11 5)
+let () = print_map (random_map 20 8)

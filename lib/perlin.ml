@@ -39,5 +39,5 @@ let round (t : float) =
 let bool_of_float t = 
   if t > 0. then true else false
 
-let perlin_noise_grid_bool w h = 
-  Array.map (fun arr -> Array.map (fun v -> bool_of_float (round v)) arr) (perlin_noise_grid w h 10.)
+let perlin_noise_grid_bool w h s = 
+  Array.map (fun arr -> Array.map (fun v -> v > 0.) arr) (perlin_noise_grid w h s) 
