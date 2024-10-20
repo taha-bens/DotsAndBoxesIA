@@ -1,13 +1,7 @@
 
-(* type (provisoire ?) *)
+open Player
+open Map
 
-type grid = string (*Array of array of content *)
-
-(* move = coordonnée * mur_pos *)
-type move = char * int * char
-
-(* Player = id * stratégie *)
-type player =  int * (grid -> move)
 
 (* La partie est elle terminée ? *)
 let game_complet () = Random.bool ()
@@ -18,18 +12,23 @@ let update_score (l : int list) ((id,_) : player) = List.mapi (fun i x -> if i =
 
 (* Applique la stratégie d'un jouer sur la grille, renvoie true si l'action a permis de compléter une case *)
 (* Il faut vérifier que c'est bien un coup légale *)
-let do_move ((id, strategie) : player) (g : grid) = print_string ("Le joueur : " ^ (string_of_int id) ^ " joue " ^ (let (_,_,c) = strategie g in String.make 1 c) ^ " sur la grille \n"); true
+let do_move ((id, strategie) : player) (m : map) = print_string ("Le joueur : " ^ (string_of_int id) ^ " joue " ^ ((fun (x,y,z) ->  (String.make 1 x) ^ string_of_int y ^ (String.make 1 z)) (strategie m)) ^ " sur la grille \n"); true
 
 
 (* Une Partie : Prend une liste de joueurs et une grille de jeu et renvoie la liste des scores *)
-let play_game (players : player list) (g : grid) = 
+let play_game (players : player list) (m : map) = 
+
+  print_string "On lance une partie \n";
+
 
   let rec play_step score =
     if not (game_complet ()) then
 
       let score = List.fold_left 
         (fun score player -> 
-        if do_move player g then 
+          print_map m;
+          print_string ("C'est au joueur " ^ string_of_int (fst player) ^ " de jouer : \n");
+        if do_move player m then 
           update_score score player
         else score)
         score players in
@@ -38,4 +37,4 @@ let play_game (players : player list) (g : grid) =
     else score
   in 
 
-  play_step []
+  play_step (List.init ((List.length players) + 1) (fun _ -> 0))
