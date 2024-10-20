@@ -1,4 +1,3 @@
 (library
- (name )
- (public_name )
- (libraries ))
+ (name dnb)
+ (public_name dnb.lib))
