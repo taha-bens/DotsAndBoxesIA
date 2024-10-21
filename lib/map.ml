@@ -26,6 +26,14 @@ let set_bin (c : cell) (i : int) (v : bool) =
       
 let get_bin (c : cell) (i : int) = 
   rfb c.bin i
+
+let fill_map m =
+  for i = 0 to m.height -1 do
+    for j = 0 to m.width -1 do
+      if m.content.(i).(j).bin = "1111" then m.content.(i).(j).content <- -1
+    done
+  done;
+  m
   
 let random_map w h =
   let return : cell array array = Array.init h (fun _ -> Array.init w (fun _ -> {bin="0000"; content= 0})) in
@@ -44,7 +52,7 @@ let random_map w h =
       if j = w-1 then set_bin return.(i).(j) 3 true else ();
     done
   done;
-  {width=w; height=h; content=return}
+  fill_map {width=w; height=h; content=return}
 
 let perlin_map w h =
   let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
@@ -62,7 +70,7 @@ let perlin_map w h =
       if j = w-1 then set_bin return.(i).(j) 3 true else ();
     done
   done;
-  {width=w; height=h; content=return}
+  {width=w; height=h; content=fill_map return}
   
 let isValid_map m =
   let rec tmp m x y =
