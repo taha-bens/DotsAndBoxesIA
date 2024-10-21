@@ -12,7 +12,7 @@ let game_complet () = Random.bool ()
 let update_score (l : int list) (id : int) = List.mapi (fun i x -> if i = id then x+1 else x) l
 
 (* Applique le move d'un jouer sur la grille, renvoie true si l'action a permis de compléter une case *)
-let do_move (_ : map) (_ : move) = true
+let do_move (_ : map) (_ : move) = Random.bool ()
 
 (* renvoie la n-ème lettre de l'alphabet en Majuscule *)
 let nth_letter n =
@@ -65,13 +65,15 @@ let play_game (players : player list) (m : map) =
   let rec play_step score =
     if not (game_complet ()) then
 
-      let score = List.fold_left 
-        (fun score player -> 
-          match player_turn_play m player 0 with
-          | Wrong -> print_string "Le joueur n'a pas pu jouer \n"; score;
-          | Ok -> score;
-          | BoxCompleted -> update_score score (fst player)
-        )
+
+      let rec aux score player =  
+        match player_turn_play m player 0 with
+        | Wrong -> print_string "Le joueur n'a pas pu jouer \n"; score;
+        | Ok -> score;
+        | BoxCompleted -> print_string "Tu as complété une case, tu peux rejouer\n"; aux (update_score score (fst player)) player
+      in 
+      
+      let score = List.fold_left aux 
         score players in
 
     play_step score 
