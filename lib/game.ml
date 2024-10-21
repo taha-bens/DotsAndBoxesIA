@@ -1,6 +1,7 @@
 
 open Player
 open Map
+open Display
 
 
 type move_result = Wrong | Ok | BoxCompleted
@@ -12,7 +13,7 @@ let game_complet () = Random.bool ()
 let update_score (l : int list) (id : int) = List.mapi (fun i x -> if i = id then x+1 else x) l
 
 (* Applique le move d'un jouer sur la grille, renvoie true si l'action a permis de compléter une case *)
-let do_move (_ : map) (_ : move) = Random.bool ()
+let do_move (_ : map) (mo : move) = print_message ("Le joueur à joué : " ^ (move_to_string mo) ^ "\n"); Random.bool ()
 
 (* renvoie la n-ème lettre de l'alphabet en Majuscule *)
 let nth_letter n =
@@ -46,10 +47,10 @@ let rec player_turn_play (m : map) ((id,strategy) : player) (attempt : int) =
   if attempt >= 5 then Wrong 
   else
     (
-    print_string ("C'est au joueur " ^ string_of_int id ^ " de jouer : \n");
+    print_message ("C'est au joueur " ^ string_of_int id ^ " de jouer : \n");
     print_map m;
     let mv = (match check_move m (strategy m) with
-    | Error -> print_string "Le coup n'est pas valide, Réessaie !\n" ;player_turn_play m (id,strategy) (attempt +1)
+    | Error -> print_message "Le coup n'est pas valide, Réessaie !\n" ;player_turn_play m (id,strategy) (attempt +1) (*Pourquoi les print_message ne se font pas ici ?*)
     | Move (x,y,z) ->  if do_move m (Move (x,y,z)) then BoxCompleted else Ok) in 
     mv
     ) 
@@ -59,7 +60,7 @@ let rec player_turn_play (m : map) ((id,strategy) : player) (attempt : int) =
 (* Une Partie : Prend une liste de joueurs et une grille de jeu et renvoie la liste des scores *)
 let play_game (players : player list) (m : map) = 
 
-  print_string "On lance une partie \n";
+  print_message "On lance une partie \n";
 
 
   let rec play_step score =
@@ -68,9 +69,9 @@ let play_game (players : player list) (m : map) =
 
       let rec aux score player =  
         match player_turn_play m player 0 with
-        | Wrong -> print_string "Le joueur n'a pas pu jouer \n"; score;
+        | Wrong -> print_message "Le joueur n'a pas pu jouer \n"; score;
         | Ok -> score;
-        | BoxCompleted -> print_string "Tu as complété une case, tu peux rejouer\n"; aux (update_score score (fst player)) player
+        | BoxCompleted -> print_message "Tu as complété une case, tu peux rejouer\n"; aux (update_score score (fst player)) player
       in 
       
       let score = List.fold_left aux 

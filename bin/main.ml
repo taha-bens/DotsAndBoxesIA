@@ -2,6 +2,7 @@
 open Dnb.Map
 open Dnb.Game
 open Dnb.Player
+open Dnb.Display
 
 
 
@@ -13,7 +14,7 @@ let rec main_loop continue m =
 
     let players = (make_player_list ()) in 
     let score = play_game players m in
-    print_string ("score : " ^ (String.concat ", " (List.map string_of_int (List.tl score))) ^ "\n");
+    print_message ("score : " ^ (String.concat ", " (List.map string_of_int (List.tl score))) ^ "\n");
 
     print_string "Voulez-vous jouer à nouveau ? (o/n) : \n";
 

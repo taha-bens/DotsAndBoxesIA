@@ -2,6 +2,7 @@
 (* Module des futures IA, C'est ici que le programme viens chercher la liste de joueurs *)
 
 open Map
+open Display
 
 (* move = coordonnée * mur_pos *)
 type move = Move of char * int * char | Error
@@ -16,6 +17,10 @@ let string_to_move (s : string) : move =
   else
     try (Move (s.[0], int_of_string (String.make 1 s.[1]), s.[2])) with Failure _ -> Error
 
+let move_to_string (m : move) = 
+  match m with 
+  | Error -> "Error"
+  | Move (x,y,z) -> (String.make 1 x) ^ (string_of_int y) ^ (String.make 1 z) 
 
 (* stratégie d'un joueur sur le terminal*)
 let strategy_terminal = fun _ -> string_to_move (read_line ())
@@ -29,15 +34,15 @@ let strategyB = fun _ -> Move ('G',5,'O')
 (* Crée la liste des joueurs de la partie (bots compris) *)
 let rec make_player_list () : player list = 
 
-  print_string "récup des données \nCombien de joueurs ?" ;
+  print_message "récup des données \nCombien de joueurs ?" ;
   let n = read_int_opt () in (*n doit être un entier*)
   let l = match n with
-  | None -> (print_string "On demande un entier !\n";
+  | None -> (print_message "On demande un entier !\n";
             make_player_list ())
   | Some n -> (
 
 
-    print_string "Quels bots ?";
+  print_message "Quels bots ?";
     let botslist = let s = read_line () in if s = "" || s = " " then [] else String.split_on_char ',' s in   (*Gérer les cas sans bots ( '' )*)
     
     let l = 
@@ -52,7 +57,7 @@ let rec make_player_list () : player list =
 
 
     if (List.length l) < 2 then (
-      print_string "On ne peut pas jouer seul au jeu\n";
+      print_message "On ne peut pas jouer seul au jeu\n";
       make_player_list ();
     )
     else
