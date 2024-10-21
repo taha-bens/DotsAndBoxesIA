@@ -4,68 +4,67 @@
 open Map
 
 (* move = coordonnée * mur_pos *)
-type move = char * int * char
+type move = Move of char * int * char | Error
 
-(* Player = id * stratégie (le player à une copie de la map)*)
+(* Player = id * stratégie (le player à une copie de la map) *)
 type player =  int * (map -> move)
 
-(* converti une chaîne de caractère au bon format en un move
-  alpha : borne sup des lettres 
-  n : borne sup des entiers
-*)
-let string_to_move (alpha : char) (n : int) (s : string) : move =
+(* converti une chaîne de caractère de 3 caractères en un move *)
+let string_to_move (s : string) : move =
   if String.length s <> 3 then
-    failwith "La chaîne doit contenir exactement 3 caractères"
+    Error (* failwith "La chaîne doit contenir exactement 3 caractères" *)
   else
-    let first = s.[0] in
-    let second = int_of_string (String.make 1 s.[1]) in
-    let third = s.[2] in
-    if first < 'A' || first > alpha || alpha < 'A' || alpha > 'Z' then
-      failwith ("Le premier caractère doit être compris entre A et alpha = " ^ (String.make 1 alpha) ^ " (alpha < Z)")
-    else if not (List.mem third ['N';'O';'S';'E'])then
-      failwith ("Le troisième argument doit être 'N','O','S' ou bien 'E'")
-    else if second < 1 || second > n then
-      failwith (Printf.sprintf "Le deuxième caractère doit être un chiffre entre 1 et %d" n)
-    else
-      (first, second, third)
+    try (Move (s.[0], int_of_string (String.make 1 s.[1]), s.[2])) with Failure _ -> Error
 
-(* renvoie la n-ème lettre de l'alphabet en Majuscule *)
-let nth_letter n =
-  if n < 1 || n > 26 then
-    failwith "Le nombre doit être compris entre 1 et 26"
-  else
-    Char.chr (64 + n)
 
 (* stratégie d'un joueur sur le terminal*)
-let strategy_terminal = fun m -> string_to_move (nth_letter m.width) m.height (read_line ())
+let strategy_terminal = fun _ -> string_to_move (read_line ())
 
 (* stratégies :*)
-let strategyA = fun _ -> ('F',3,'N')  
+let strategyA = fun _ -> Move ('F',3,'N')  
 
-let strategyB = fun _ -> ('G',5,'O')
+let strategyB = fun _ -> Move ('G',5,'O')
 
 
 (* Crée la liste des joueurs de la partie (bots compris) *)
-let make_player_list ((p : int),(botslist : string list)) : player list = 
-  let l = List.init p (fun i -> (i + 1,strategy_terminal)) @
+let rec make_player_list () : player list = 
 
-  List.mapi 
-  (fun i s -> 
-    let id = p + i + 1 in
-    match s with
-    | "sA" -> (id,strategyA)
-    | "sB" -> (id,strategyB)
-    | _ -> (id,strategy_terminal)) botslist in
-  if (List.length l) < 2 then 
-    failwith "On ne peut pas jouer seul au jeu"
-  else
-    l
+  print_string "récup des données \nCombien de joueurs ?" ;
+  let n = read_int_opt () in (*n doit être un entier*)
+  let l = match n with
+  | None -> (print_string "On demande un entier !\n";
+            make_player_list ())
+  | Some n -> (
+
+
+    print_string "Quels bots ?";
+    let botslist = let s = read_line () in if s = "" || s = " " then [] else String.split_on_char ',' s in   (*Gérer les cas sans bots ( '' )*)
+    
+    let l = 
+      List.init n (fun i -> (i + 1,strategy_terminal)) @
+      List.mapi 
+      (fun i s -> 
+        let id = n + i + 1 in
+        match s with
+        | "sA" -> (id,strategyA)
+        | "sB" -> (id,strategyB)
+        | _ -> (id,strategy_terminal)) botslist in
+
+
+    if (List.length l) < 2 then (
+      print_string "On ne peut pas jouer seul au jeu\n";
+      make_player_list ();
+    )
+    else
+      l
+
+  ) in l
 
 
 
 let (players : player list) = [
-  (1,fun _ -> ('F',1,'E'));
-  (2,fun _ -> ('C',4,'S'));
+  (1,fun _ -> Move ('F',1,'E'));
+  (2,fun _ -> Move ('C',4,'S'));
   (3, strategyA)
   ]
 
