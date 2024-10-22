@@ -6,7 +6,7 @@ type map = {width:int; height:int; content: cell array array} (* width and heigh
            
 (*'read formatted binary' - format : "0100", 0 <= i <= 3
  * raise Invalid_argument if 's' doesn't respect the specified format
- *)
+*)
 let rfb (s : string) (i : int) =
   let c = String.get s i in 
   match c with
@@ -21,7 +21,7 @@ let modify_string s i c = (* strings are not mutable in OCaml... :-(  *)
            
 (*'write formatted binary' - format : "0100", 0 <= i <= 3)
  * raise Invalid_argument if 'i' is not between 0 and 3
- *)
+*)
 let wfb (s : string) (i : int) (v : bool) = 
   let c = if v then '1' else '0' in
   if i >= 0 && i < 4 then modify_string s i c else 
@@ -58,19 +58,19 @@ let random_map w h = (*random map generation with ~25% blocks*)
   done;
   {width=w; height=h; content=fill_map return}
 
-let perlin_map w h = (*procedural map generation using perlin noise defined in 'perlin.ml'*)
-  let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
-  for i = 0 to h-1 do
-    for j = 0 to w-1 do
-      if return.(i).(j).content = -1 then 
-        (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
-        if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
-        if i > 0 then set_bin return.(i-1).(j) 2 true else ();
-        if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
-      else ();
-    done
-  done;
-  {width=w; height=h; content=fill_map return}
+    (*let perlin_map w h = (*procedural map generation using perlin noise defined in 'perlin.ml'*)
+       let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
+       for i = 0 to h-1 do
+         for j = 0 to w-1 do
+           if return.(i).(j).content = -1 then 
+             (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
+              if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
+              if i > 0 then set_bin return.(i-1).(j) 2 true else ();
+              if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
+           else ();
+         done
+       done;
+       {width=w; height=h; content=fill_map return}*)
   
 let isValid_map m = (*checks walls consistency*)
   let rec tmp m x y =
@@ -137,20 +137,21 @@ let is_full m = (*return true if all cell content are != 0*)
     if x >= m.width then tmp 0 (y+1) 
     else if y >= m.height then true
     else 
-      if m.content.(y).(x).content = 0 then false else tmp (x+1) y
+    if m.content.(y).(x).content = 0 then false else tmp (x+1) y
+  in tmp 0 0
 
 (*place a 'side' wall in the '(col, row)' cell and if it's full set content to 'content'
  * raise Invalid_argument exception if the cell is not empty or if side is not between 0 and 3
- *)
+*)
 let place_wall m row col (side : int) (content : int) = 
   let c = m.content.(row).(col) in
-  if not (c.content = 0) then raise Invalid_argument ("cell is not empty")
+  if not (c.content = 0) then raise (Invalid_argument "cell is not empty")
   else
     (match side with
-    | 0 -> if y = 0 then () else set_bin m.content.(row-1).(col) 2 true
-    | 1 -> if x = 0 then () else set_bin m.content.(row).(col-1) 3 true
-    | 2 -> if y = m.height-1 then () else set_bin m.content.(row+1).(col) 0 true
-    | 3 -> if x = m.width-1 then () else set_bin m.content.(row).(col+1) 1 true
-    | _ -> raise Invalid_argument ("side must be between 0 and 3"));
-    set_bin c side true;
-    if c.bin = "1111" then c.content <- content else ()
+     | 0 -> if row = 0 then () else set_bin m.content.(row-1).(col) 2 true
+     | 1 -> if col = 0 then () else set_bin m.content.(row).(col-1) 3 true
+     | 2 -> if row = m.height-1 then () else set_bin m.content.(row+1).(col) 0 true
+     | 3 -> if col = m.width-1 then () else set_bin m.content.(row).(col+1) 1 true
+     | _ -> raise (Invalid_argument "side must be between 0 and 3"));
+  set_bin c side true;
+  if c.bin = "1111" then c.content <- content else ()
