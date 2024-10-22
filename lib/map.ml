@@ -27,13 +27,15 @@ let set_bin (c : cell) (i : int) (v : bool) =
 let get_bin (c : cell) (i : int) = 
   rfb c.bin i
 
-let fill_map m =
-  for i = 0 to m.height -1 do
-    for j = 0 to m.width -1 do
-      if m.content.(i).(j).bin = "1111" then m.content.(i).(j).content <- -1
+let fill_map (g : cell array array) =
+  let height = Array.length g in
+  let width = Array.length g.(0) in
+  for i = 0 to height-1 do
+    for j = 0 to width-1 do
+      if g.(i).(j).bin = "1111" then g.(i).(j).content <- -1
     done
   done;
-  m
+  g
   
 let random_map w h =
   let return : cell array array = Array.init h (fun _ -> Array.init w (fun _ -> {bin="0000"; content= 0})) in
@@ -45,14 +47,10 @@ let random_map w h =
          if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
          if i > 0 then set_bin return.(i-1).(j) 2 true else ();
          if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
-      else ();
-      if i = 0 then set_bin return.(i).(j) 0 true else ();
-      if i = h-1 then set_bin return.(i).(j) 2 true else ();
-      if j = 0 then set_bin return.(i).(j) 1 true else ();
-      if j = w-1 then set_bin return.(i).(j) 3 true else ();
+      else ()
     done
   done;
-  fill_map {width=w; height=h; content=return}
+  {width=w; height=h; content=fill_map return}
 
 let perlin_map w h =
   let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
@@ -60,14 +58,10 @@ let perlin_map w h =
     for j = 0 to w-1 do
       if return.(i).(j).content = -1 then 
         (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
-         if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
-         if i > 0 then set_bin return.(i-1).(j) 2 true else ();
-         if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
+        if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
+        if i > 0 then set_bin return.(i-1).(j) 2 true else ();
+        if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
       else ();
-      if i = 0 then set_bin return.(i).(j) 0 true else ();
-      if i = h-1 then set_bin return.(i).(j) 2 true else ();
-      if j = 0 then set_bin return.(i).(j) 1 true else ();
-      if j = w-1 then set_bin return.(i).(j) 3 true else ();
     done
   done;
   {width=w; height=h; content=fill_map return}
@@ -77,24 +71,18 @@ let isValid_map m =
     if x >= m.width then tmp m 0 (y+1) else
     if y >= m.height then true else 
       let c = m.content.(y).(x) in
-      let b1 = 
-        if x = 0 then (get_bin c 1 && (if y = 0 then get_bin c 0 else true))
-        else if y = 0 then get_bin c 0 else true
-      in let b2 =
-           if x = m.width-1 then 
-             (get_bin c 3 && 
-              (if y = m.height-1 then get_bin c 2 
-               else (get_bin c 2 = get_bin m.content.(y+1).(x) 0)))
-           else if y = m.height-1 then 
-             ((get_bin c 2) && 
-              (get_bin c 3 = get_bin m.content.(y).(x+1) 1)) 
-           else ((get_bin c 2 = get_bin m.content.(y+1).(x) 0) && 
-                 (get_bin c 3 = get_bin m.content.(y).(x+1) 1))
-      in b1 && b2 && tmp m (x+1) y
+      let b1 =
+        match (x = m.width-1, y = m.height-1) with
+        | (true, true) -> true
+        | (true, false) -> get_bin c 2 = get_bin m.content.(y+1).(x) 0
+        | (false, true) -> get_bin c 3 = get_bin m.content.(y).(x+1) 1
+        | (false, false) -> get_bin c 2 = get_bin m.content.(y+1).(x) 0 && get_bin c 3 = get_bin m.content.(y).(x+1) 1
+      in b1 && tmp m (x+1) y
   in tmp m 0 0
            
 let print_line_map m l =
-  if l >= m.height then () else
+  if l >= m.height then () 
+  else
     let length = m.width * 7 + 1 in
     if l = 0 then (* first line case *)
       let bufz = Buffer.create (length) in 
