@@ -1,8 +1,19 @@
 Random.init;;
 
 type cell = {mutable bin:string; mutable content:int} (*Norme binaire : NOSE*)
+
+let cells_equal c1 c2 = c1.bin = c2.bin && c1.content = c2.content
             
 type map = {width:int; height:int; content: cell array array} (* width and height need to be >= 2 *)
+
+let maps_equal m1 m2 = 
+  if m1.width <> m2.width || m1.height <> m2.height then false
+  else
+    let rec tmp x y = 
+      if x >= m1.width then tmp 0 (y+1) 
+      else if y >= m1.height then true
+      else if not (cells_equal m1.content.(y).(x) m2.content.(y).(x)) then false else tmp (x+1) y
+    in tmp 0 0
            
 (*'read formatted binary' - format : "0100", 0 <= i <= 3
  * raise Invalid_argument if 's' doesn't respect the specified format
@@ -58,19 +69,19 @@ let random_map w h = (*random map generation with ~25% blocks*)
   done;
   {width=w; height=h; content=fill_map return}
 
-    (*let perlin_map w h = (*procedural map generation using perlin noise defined in 'perlin.ml'*)
-       let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
-       for i = 0 to h-1 do
-         for j = 0 to w-1 do
-           if return.(i).(j).content = -1 then 
-             (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
-              if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
-              if i > 0 then set_bin return.(i-1).(j) 2 true else ();
-              if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
-           else ();
-         done
-       done;
-       {width=w; height=h; content=fill_map return}*)
+let perlin_map w h = (*procedural map generation using perlin noise defined in 'perlin.ml'*)
+    let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
+    for i = 0 to h-1 do
+      for j = 0 to w-1 do
+        if return.(i).(j).content = -1 then 
+          (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
+          if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
+          if i > 0 then set_bin return.(i-1).(j) 2 true else ();
+          if i < h-1 then set_bin return.(i+1).(j) 0 true else ())
+        else ();
+      done
+    done;
+    {width=w; height=h; content=fill_map return}
   
 let isValid_map m = (*checks walls consistency*)
   let rec tmp m x y =
