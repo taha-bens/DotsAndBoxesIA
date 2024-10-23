@@ -2,8 +2,6 @@ open OUnit2
 open Dnb.Game
 open QCheck
 
-
-
 let test_nth_letter _ =
   assert_equal (nth_letter 1) (Some 'A');
   assert_equal (nth_letter 26) (Some 'Z');
@@ -33,20 +31,14 @@ let map_move_gen map_gen =
     Gen.map (fun move -> (map,move)) (Test_player.move_gen c h)
   )
 
-(* test_check_move selon différent générateur de map *)
+(* test check_move selon différent générateur de map *)
 let test_check_move map_gen = 
   let open Dnb.Player in 
 
   QCheck.Test.make ~count:10 ~name:"test_check_move"
 
-  (make ~print: (fun (_,move) -> 
-    match move with
-  | Error -> "Move Error"
-  | Move (x,y,z) -> "Move : " ^ (String.make 1 x) ^ (string_of_int y) ^ (String.make 1 z)) 
-
-
-  (map_move_gen map_gen)
-  )
+  (make ~print: (fun (_,move) -> move_to_string move)
+  (map_move_gen map_gen))
 
   (fun (map,move) -> 
     match Dnb.Game.check_move map move with
@@ -56,7 +48,27 @@ let test_check_move map_gen =
 
 
 
+(* C'est pas du tout un test valable !!! 
+Ca génère une map et un joeur et ca regarde si le joueur joue bien (SUBJECTIF) !! 
+Ici ça revient à tester si le coup est en dehors de la map 
+A REVOIR !!
+*)
+let test_player_turn_play map_gen = 
+  QCheck.Test.make ~count:10 ~name:"test_player_turn_play"
 
+  (make ~print: (fun (map,(id,strat)) -> "Le joueur id = " ^ string_of_int id ^ " à voulu jouer : " ^ (Dnb.Player.move_to_string (strat map)))
+
+  Gen.(map_gen >>= fun (map : Dnb.Map.map) -> 
+    Gen.map (fun (p: Dnb.Player.player) -> (map, p))  (Test_player.player_gen map)
+  ))
+
+  (fun (map,p) -> 
+    match player_turn_play map p 0 with
+    | Wrong -> false
+    | Ok -> true
+    | BoxCompleted -> true
+  
+  )
 
 
 

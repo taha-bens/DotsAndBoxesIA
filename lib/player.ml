@@ -17,6 +17,11 @@ let string_to_move (s : string) : move =
     try (Move (s.[0], int_of_string (String.make 1 s.[1]), s.[2])) with Failure _ -> Error
 
 
+let move_to_string = function
+| Error -> "Move Error"
+| Move (x,y,z) -> "Move : " ^ (String.make 1 x) ^ (string_of_int y) ^ (String.make 1 z)
+
+
 (* stratégie d'un joueur sur le terminal*)
 let strategy_terminal = fun _ -> string_to_move (read_line ())
 
