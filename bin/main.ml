@@ -3,9 +3,6 @@ open Dnb.Map
 open Dnb.Game
 open Dnb.Player
 
-
-
-
 (* Boucle principale du jeu *)
 let rec main_loop continue m = 
   if continue then

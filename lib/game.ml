@@ -17,17 +17,17 @@ let do_move (_ : map) (_ : move) = Random.bool ()
 (* renvoie la n-ème lettre de l'alphabet en Majuscule *)
 let nth_letter n =
   if n < 1 || n > 26 then
-    failwith "Le nombre doit être compris entre 1 et 26"
+    None (*failwith "Le nombre doit être compris entre 1 et 26"*)
   else
-    Char.chr (64 + n)
+    Some (Char.chr (64 + n))
 
 (* Vérifie si un coup est bien légale *)
 let check_move (ma : map) (mo : move) = 
-  let alpha = nth_letter ma.width in 
+  let alpha = match nth_letter ma.width with None -> ' '| Some c -> c in 
   let n = ma.height in  
   match mo with
   | Move (first,second,third) -> (
-    if first < 'A' || first > alpha || alpha < 'A' || alpha > 'Z' then
+    if alpha = ' ' || first < 'A' || first > alpha || alpha < 'A' || alpha > 'Z' then
       Error (* failwith ("Le premier caractère doit être compris entre A et alpha = " ^ (String.make 1 alpha) ^ " (alpha < Z)") *)
     else if not (List.mem third ['N';'O';'S';'E'])then
       Error (* failwith ("Le troisième argument doit être 'N','O','S' ou bien 'E'") *)

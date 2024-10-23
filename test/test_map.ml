@@ -1,5 +1,5 @@
 open OUnit2
-open Map
+open Dnb.Map
 
 let test_rfb _ = 
   assert_equal (rfb "0000" 0) false;
