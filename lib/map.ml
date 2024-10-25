@@ -1,6 +1,10 @@
-Random.init;;
 
-type cell = {mutable bin:string; mutable content:int} (*Norme binaire : NOSE*)
+type side = N | O | S | E
+type content = Void | Block | CompletedBy of int
+
+exception MapException of string
+
+type cell = {mutable bin:string; mutable content:content} (*Norme binaire : NOSE*) (* content doit être du type content *)
 
 let cells_equal c1 c2 = c1.bin = c2.bin && c1.content = c2.content
             
@@ -49,17 +53,17 @@ let fill_map (g : cell array array) = (*set "1111" cells content to -1*)
   let width = Array.length g.(0) in
   for i = 0 to height-1 do
     for j = 0 to width-1 do
-      if g.(i).(j).bin = "1111" then g.(i).(j).content <- -1
+      if g.(i).(j).bin = "1111" then g.(i).(j).content <- Block
     done
   done;
   g
   
 let random_map w h = (*random map generation with ~25% blocks*)
-  let return : cell array array = Array.init h (fun _ -> Array.init w (fun _ -> {bin="0000"; content= 0})) in
+  let return : cell array array = Array.init h (fun _ -> Array.init w (fun _ -> {bin="0000"; content=Void})) in
   for i = 0 to h-1 do
     for j = 0 to w-1 do
       if Random.bool () && Random.bool () then 
-        (return.(i).(j) <- {bin="1111"; content= -1};
+        (return.(i).(j) <- {bin="1111"; content= Block};
          if j > 0 then set_bin return.(i).(j-1) 3 true else ();
          if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
          if i > 0 then set_bin return.(i-1).(j) 2 true else ();
@@ -70,10 +74,10 @@ let random_map w h = (*random map generation with ~25% blocks*)
   {width=w; height=h; content=fill_map return}
 
 let perlin_map w h = (*procedural map generation using perlin noise defined in 'perlin.ml'*)
-    let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= -1} else {bin="0000"; content=0}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
+    let return = Array.map (fun arr -> Array.map (fun b -> if b then {bin="1111"; content= Block} else {bin="0000"; content=Void}) arr) (Perlin.perlin_noise_grid_bool w h 2.) in
     for i = 0 to h-1 do
       for j = 0 to w-1 do
-        if return.(i).(j).content = -1 then 
+        if return.(i).(j).content = Block then 
           (if j > 0 then set_bin return.(i).(j-1) 3 true else ();
           if j < w-1 then set_bin return.(i).(j+1) 1 true else ();
           if i > 0 then set_bin return.(i-1).(j) 2 true else ();
@@ -119,11 +123,11 @@ let print_line_map m l = (*print 'l'-th line of map 'm' using the format specifi
         else (); 
         if get_bin c 2 then Buffer.add_string bbot "------" else Buffer.add_string bbot "      ";
         (match c.content with 
-         | 0 -> (Buffer.add_string b1 "      ";
+         | Void -> (Buffer.add_string b1 "      ";
                  Buffer.add_string b2 "      ")
-         | -1 -> (Buffer.add_string b1 "&&&&&&";
+         | Block -> (Buffer.add_string b1 "&&&&&&";
                   Buffer.add_string b2 "&&&&&&")
-         | i -> (Buffer.add_string b1 ("!!P" ^ (string_of_int i) ^ "!!");
+         | CompletedBy i -> (Buffer.add_string b1 ("!!P" ^ string_of_int i ^ "!!");
                  Buffer.add_string b2 "!!!!!!"));
         if get_bin c 3 then 
           (Buffer.add_char b1 '|'; Buffer.add_char b2 '|') 
@@ -148,21 +152,20 @@ let is_full m = (*return true if all cell content are != 0*)
     if x >= m.width then tmp 0 (y+1) 
     else if y >= m.height then true
     else 
-    if m.content.(y).(x).content = 0 then false else tmp (x+1) y
+    if m.content.(y).(x).content = Void then false else tmp (x+1) y
   in tmp 0 0
 
 (*place a 'side' wall in the '(col, row)' cell and if it's full set content to 'content'
  * raise Invalid_argument exception if the cell is not empty or if side is not between 0 and 3
 *)
-let place_wall m row col (side : int) (content : int) = 
+let place_wall m row col (s : side) (content : int) = 
   let c = m.content.(row).(col) in
-  if not (c.content = 0) then raise (Invalid_argument "cell is not empty")
+  if c.content <> Void then raise (MapException "cell is not empty")
   else
-    (match side with
-     | 0 -> if row = 0 then () else set_bin m.content.(row-1).(col) 2 true
-     | 1 -> if col = 0 then () else set_bin m.content.(row).(col-1) 3 true
-     | 2 -> if row = m.height-1 then () else set_bin m.content.(row+1).(col) 0 true
-     | 3 -> if col = m.width-1 then () else set_bin m.content.(row).(col+1) 1 true
-     | _ -> raise (Invalid_argument "side must be between 0 and 3"));
-  set_bin c side true;
-  if c.bin = "1111" then c.content <- content else ()
+    (match s with
+     | N -> if row = 0 then () else set_bin m.content.(row-1).(col) 2 true
+     | O -> if col = 0 then () else set_bin m.content.(row).(col-1) 3 true
+     | S -> if row = m.height-1 then () else set_bin m.content.(row+1).(col) 0 true
+     | E -> if col = m.width-1 then () else set_bin m.content.(row).(col+1) 1 true);
+  set_bin c 0 (* mettre s à la place de 0 : On doit gérer le type side *) true;
+  if c.bin = "1111" then (c.content <- CompletedBy content; true) else false

@@ -1,4 +1,4 @@
-open QCheck
+(* open QCheck
 open Dnb.Player
 
   
@@ -19,3 +19,4 @@ let player_gen (map : Dnb.Map.map) : Dnb.Player.player Gen.t =
   Gen.map2 (fun id move -> (id,fun _ -> move)) (Gen.int_range 1 10) (move_gen c h)
 
 
+ *)

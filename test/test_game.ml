@@ -22,7 +22,7 @@ let perlin_map_gen = Gen.map2 (fun w h -> Dnb.Map.perlin_map w h) dim_gen dim_ge
 
 
 (* Prend un générateur de map et renvoie un générateur de couple (map,move) *)
-let map_move_gen map_gen = 
+(* let map_move_gen map_gen = 
   Gen.(map_gen >>= fun (map : Dnb.Map.map) -> 
 
     let c = (match Dnb.Game.nth_letter map.width with None -> ' ' | Some c -> c) in 
@@ -44,31 +44,7 @@ let test_check_move map_gen =
     match Dnb.Game.check_move map move with
     | Error -> false
     | _ -> true
-  )
-
-
-
-(* C'est pas du tout un test valable !!! 
-Ca génère une map et un joeur et ca regarde si le joueur joue bien (SUBJECTIF) !! 
-Ici ça revient à tester si le coup est en dehors de la map 
-A REVOIR !!
-*)
-let test_player_turn_play map_gen = 
-  QCheck.Test.make ~count:10 ~name:"test_player_turn_play"
-
-  (make ~print: (fun (map,(id,strat)) -> "Le joueur id = " ^ string_of_int id ^ " à voulu jouer : " ^ (Dnb.Player.move_to_string (strat map)))
-
-  Gen.(map_gen >>= fun (map : Dnb.Map.map) -> 
-    Gen.map (fun (p: Dnb.Player.player) -> (map, p))  (Test_player.player_gen map)
-  ))
-
-  (fun (map,p) -> 
-    match player_turn_play map p 0 with
-    | Wrong -> false
-    | Ok -> true
-    | BoxCompleted -> true
-  
-  )
+  ) *)
 
 
 

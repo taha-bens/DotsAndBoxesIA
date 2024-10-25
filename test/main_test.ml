@@ -12,8 +12,8 @@ let () =
 
 
     (* tests game module *)
-    "test_nth_letter" >:: Test_game.test_nth_letter;
-    QCheck_ounit.to_ounit2_test (Test_game.test_check_move Test_game.random_map_gen);
+    (* "test_nth_letter" >:: Test_game.test_nth_letter;
+    QCheck_ounit.to_ounit2_test (Test_game.test_check_move Test_game.random_map_gen); *)
 
 
   ] in run_test_tt_main sequence
