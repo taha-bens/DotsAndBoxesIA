@@ -19,6 +19,10 @@ let rec get_int (mess : string) (mess_error : string) =
 let rec main_loop continue =
   if continue then (
 
+    clear_and_print game_name;
+    prerr_endline "'Entrer' pour lancer une partie";
+    let _ = read_line () in 
+
     let mess_error = "mauvaise saisie ! Réessaie !" in 
     let w = get_int "largeur de la map : " mess_error in 
     let h = get_int "hauteur de la map : " mess_error in
