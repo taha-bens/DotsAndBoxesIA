@@ -1,3 +1,5 @@
+open Perlin
+
 (* Types et exceptions ----------------------------------------------------- *)
 (* Les maps sont représentées par tableaux 2D de cellules composées de quatre
 * murs et d'un contenu. Les cases qui sont interdites sont les Blocks, les  
@@ -11,6 +13,7 @@ type celltype = Void | Block | CompletedBy of int
 type 'a grid = 'a array array
 type cell = {walls: bool ref array; mutable ctype:celltype} (*N O S E*)
 type map = {width:int; height:int; content: cell grid}
+type play = int * int * side
 exception MapException of string
 
 
@@ -217,12 +220,21 @@ let buf_of_map (m : map) =
 	buf
 
 (* Fonctions de manipulation ----------------------------------------------- *)
-let is_legal (m : map) (p : Game.play) =
+let is_legal (m : map) (p : play) =
 	let (i, j, s) = p in
 	if i < 0 || i >= m.height || j < 0 || j >= m.width then false
 	else
 		not (get_wall_val (get_cell i j m) s)
 
-let apply_play (m : map) (p : Game.play) =
+let apply_play (m : map) (p : play) id =
 	let (i, j, s) = p in
-	set_wall (get_cell i j m) s true
+	let c = get_cell i j m in
+	set_wall c s true;
+	if is_full_cell c then (set_ctype c (CompletedBy(id)); true)
+	else false
+
+let is_full (m : map) =
+	Array.for_all 
+		(fun s_arr -> Array.for_all 
+			(fun c -> is_full_cell c) s_arr) 
+	m.content

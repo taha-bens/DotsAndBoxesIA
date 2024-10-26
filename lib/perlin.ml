@@ -1,5 +1,4 @@
-open Stdlib;;
-Random.init;;
+open Stdlib
 
 let fade (t : float) = t *. t *. t *. (t *. (t *. 6. -. 15.) +. 10.)
 
