@@ -29,6 +29,9 @@ let get_wall (c : cell) (s : side) =
   | S -> c.walls.(2)
   | E -> c.walls.(3) 
            
+let get_wall_val (c : cell) (s : side) = 
+  !(get_wall c s)
+           
 let set_wall (c : cell) (s : side) value =
   (get_wall c s) := value
   
@@ -89,95 +92,75 @@ let random_map w h =
      (fun s_arr -> Array.iter
          (fun c -> 
             if (Random.float 1.) <= proba_block then convert_to_block c else ()) s_arr) m.content);
-  m
+  m 
     
-let buf_of_map line m = 
+let buf_of_line line (m : map) = 
   let len = 6 + 7 * m.width + 1 + 1 in
-  if i = -1 then
+  if line = -1 then
     let buf = Buffer.create len in
-    (for i = 1 to len do
-       if (i/7) = 0 then Buffer.add_char buf ' '
-       else if i mod 7 = 0 then Buffer.add_char buf '.'
-       else if i mod 7 = 3 then Buffer.add_char buf (char_of_int (i/7))
-       else if i = len then Buffer.add_char buf '\n'
-       else Buffer.add_char buf '-')
-      buf
+    for i = 0 to m.width do 
+      (if i = 0 then Buffer.add_string buf "      "
+       else if i < 10 then Buffer.add_string buf ("   " ^ (string_of_int i) ^ "   ")
+       else Buffer.add_string buf ("  " ^ (string_of_int i) ^ "   "))
+    done;
+    Buffer.add_char buf '\n';
+    buf
   else 
     let buf1 = Buffer.create len in
-    let buf2 = buffer.create len in
+    let buf2 = Buffer.create len in
     let buf3 = Buffer.create len in
-    for i = 1 to len do
-      if (i/7) = 0 then 
-        (Buffer.add_char buf1 ' ';
-         Buffer.add_char buf2 (if i = 3 then char_of_int (i/7) else ' ');
-         Buffer.add_char buf3 ' ')
-      else
-		
-let print_line_map m l = (*print 'l'-th line of map 'm' using the format specified in the documentation*)
-if l >= m.height then () 
-else
-	let length = m.width * 7 + 1 in
-	if l = 0 then (* first line case *)
-	let bufz = Buffer.create (length) in 
-	for j = 0 to length-1 do
-		if j mod 7 = 0 then Buffer.add_char bufz '.' else 
-		if get_bin m.content.(l).(j / 7) 0 then Buffer.add_char bufz '-' 
-		else Buffer.add_char bufz ' ' 
-	done;
-	print_endline(Buffer.contents bufz);
-	else ();
-	let rec tmp b1 b2 bbot i = 
-	if i >= m.width then () else
-		let c = m.content.(l).(i) in 
-		if i = 0 then (Buffer.add_char bbot '.';
-					if get_bin c 1 then (Buffer.add_char b1 '|'; Buffer.add_char b2 '|';) 
-					else (Buffer.add_char b1 ' '; Buffer.add_char b2 ' ';) )
-		else (); 
-		if get_bin c 2 then Buffer.add_string bbot "------" else Buffer.add_string bbot "      ";
-		(match c.content with 
-		| Void -> (Buffer.add_string b1 "      ";
-				Buffer.add_string b2 "      ")
-		| Block -> (Buffer.add_string b1 "&&&&&&";
-				Buffer.add_string b2 "&&&&&&")
-		| CompletedBy i -> (Buffer.add_string b1 ("!!P" ^ string_of_int i ^ "!!");
-				Buffer.add_string b2 "!!!!!!"));
-		if get_bin c 3 then 
-		(Buffer.add_char b1 '|'; Buffer.add_char b2 '|') 
-		else 
-		(Buffer.add_char b1 ' '; Buffer.add_char b2 ' ');
-		Buffer.add_char bbot '.';
-		if i = m.width - 1 then 
-		(print_endline(Buffer.contents b1); 
-		print_endline(Buffer.contents b2);
-		print_endline(Buffer.contents bbot))
-		else tmp b1 b2 bbot (i+1)
-	in tmp (Buffer.create length) (Buffer.create length) (Buffer.create length) 0
-	
-let print_map m = (*print map 'm' using the format specified in the documentation*)
-let rec tmp i = 
-	if i >= m.height then () else
-	(print_line_map m i; tmp (i+1))
-in tmp 0
-
-let is_full m = (*return true if all cell content are != 0*)
-let rec tmp x y = 
-	if x >= m.width then tmp 0 (y+1) 
-	else if y >= m.height then true
-	else 
-	if m.content.(y).(x).content = Void then false else tmp (x+1) y
-in tmp 0 0
-
-(*place a 'side' wall in the '(col, row)' cell and if it's full set content to 'content'
-* raise Invalid_argument exception if the cell is not empty or if side is not between 0 and 3
-*)
-let place_wall m row col (s : side) (content : int) = 
-let c = m.content.(row).(col) in
-if c.content <> Void then raise (MapException "cell is not empty")
-else
-	(match s with
-	| N -> if row = 0 then () else set_bin m.content.(row-1).(col) 2 true
-	| O -> if col = 0 then () else set_bin m.content.(row).(col-1) 3 true
-	| S -> if row = m.height-1 then () else set_bin m.content.(row+1).(col) 0 true
-	| E -> if col = m.width-1 then () else set_bin m.content.(row).(col+1) 1 true);
-set_bin c 0 (* mettre s à la place de 0 : On doit gérer le type side *) true;
-if c.bin = "1111" then (c.content <- CompletedBy content; true) else false
+    (Buffer.add_string buf1 "      ";
+     (if line < 10 then Buffer.add_string buf2 ("   " ^ (string_of_int line) ^ "  ")
+      else Buffer.add_string buf2 ("  " ^ (string_of_int line) ^ "  "));
+     Buffer.add_string buf3 "      ");
+    (for i = 0 to (m.width-1) do
+       let c = get_cell line i m in
+       (if i = 0 then 
+          let char = if get_wall_val c O then '|' else ' ' in
+          (Buffer.add_char buf1 char;
+           Buffer.add_char buf2 char;
+           Buffer.add_char buf3 '.'));
+       (match c.ctype with
+        | Void -> 
+            (Buffer.add_string buf1 "      ";
+             Buffer.add_string buf2 "      ")
+        | Block ->
+            (Buffer.add_string buf1 "&&&&&&";
+             Buffer.add_string buf2 "&&&&&&")
+        | CompletedBy(k) ->
+            (Buffer.add_string buf1 ("!!P" ^ string_of_int k ^ "!!");
+             Buffer.add_string buf2 "!!!!!!"));
+       (if get_wall_val c S then
+          Buffer.add_string buf3 "------"
+        else Buffer.add_string buf3 "      ");
+       (let char = if get_wall_val c E then '|' else ' ' in
+        (Buffer.add_char buf1 char;
+         Buffer.add_char buf2 char;
+         Buffer.add_char buf3 '.'))
+     done;);
+    Buffer.add_char buf1 '\n';
+    Buffer.add_buffer buf1 buf2;
+    Buffer.add_char buf1 '\n';
+    Buffer.add_buffer buf1 buf3;
+    Buffer.add_char buf1 '\n';
+    if line = 0 then
+      let buf4 = Buffer.create len in
+      Buffer.add_string buf4 "      ";
+      (for j = 0 to (m.width-1) do
+         (if j = 0 then Buffer.add_char buf4 '.');
+         (if get_wall_val (get_cell 0 j m) N then Buffer.add_string buf4 "------"
+          else Buffer.add_string buf4 "      ");
+         Buffer.add_char buf4 '.';
+       done;
+      );
+      Buffer.add_char buf4 '\n';
+      Buffer.add_buffer buf4 buf1;
+      buf4
+    else buf1
+      
+let buf_of_map (m : map) =
+  let buf = Buffer.create ((3 * m.height + 1) * (6 + 7 * m.width + 1 + 1)) in
+  for i = -1 to m.height-1 do
+    Buffer.add_buffer buf (buf_of_line i m);
+  done;
+  buf
