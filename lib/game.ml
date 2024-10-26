@@ -1,84 +1,109 @@
 
-open Player
 open Map
 open Display
 
+type play = int * int * side   (* (x, y, [N-O-S-E]) *)
+type game_view = Gameview (* A voir *)
+type bot = game_view -> play
+type player = Player of int | Bot of int * bot
 
-type move_result = Wrong | Ok | BoxCompleted
 
-(* La partie est elle terminée ? *)
-let game_complet () = Random.bool ()
+(* Etat de la partie *)
+type game_state = {score : int array; player_list : player list; next_player : player; map : map}
 
-(* mise à jour du score *)
-let update_score (l : int list) (id : int) = List.mapi (fun i x -> if i = id then x+1 else x) l
+(*type error = unit (*A voir *)*)
 
-(* Applique le move d'un jouer sur la grille, renvoie true si l'action a permis de compléter une case *)
-let do_move (_ : map) (mo : move) = print_message ("Le joueur à joué : " ^ (move_to_string mo) ^ "\n"); Random.bool ()
+(* résultat d'une action sur le jeu *)
+type outcome = 
+| Next of game_state
+| Error of string 
+| Endgame of player option
 
-(* renvoie la n-ème lettre de l'alphabet en Majuscule *)
-let nth_letter n =
-  if n < 1 || n > 26 then
-    failwith "Le nombre doit être compris entre 1 et 26"
-  else
-    Char.chr (64 + n)
+let view (_ : game_state) : game_view = Gameview
 
-(* Vérifie si un coup est bien légale *)
-let check_move (ma : map) (mo : move) = 
-  let alpha = nth_letter ma.width in 
-  let n = ma.height in  
-  match mo with
-  | Move (first,second,third) -> (
-    if first < 'A' || first > alpha || alpha < 'A' || alpha > 'Z' then
-      Error (* failwith ("Le premier caractère doit être compris entre A et alpha = " ^ (String.make 1 alpha) ^ " (alpha < Z)") *)
-    else if not (List.mem third ['N';'O';'S';'E'])then
-      Error (* failwith ("Le troisième argument doit être 'N','O','S' ou bien 'E'") *)
-    else if second < 1 || second > n then
-      Error (* failwith (Printf.sprintf "Le deuxième caractère doit être un chiffre entre 1 et %d" n) *)
-    else
-      Move (first, second, third))
-  | _ -> Error
+let display (_ :game_view): unit = ()
+
+let init_game_state (w: int) (h:int) (pl :player list) = 
+  {score = Array.make (List.length pl) 0;
+  player_list = pl; 
+  next_player = List.nth pl 0; 
+  map = random_map w h} 
+
+
+(* Mise à jour du score *)
+let update_score (score : int array) (id : int) = score.(id) <- score.(id) + 1
+
+let get_player_id = function Player id -> id | Bot (id,_) -> id
+
+let get_next_player (pl : player list) (p : player) = List.nth pl ((get_player_id p + 1) mod List.length pl)
+
+(* Vérifie si un coup est bien légale (bien encodé et correcte pour la map )*)
+let check_play (m : map) ((x,y,_) : play) =
+  let w, h =  m.width, m.height in  
+    0 <= x && x < w && 0 <= y && y < h 
+    (* Vérifie pas encore si le move est corret pour la partie *)
+        
+(* Attention, ne gère pas si la hauteur est > 10 *)
+let string_to_play (s : string) : play =  print_int ((Char.code s.[0]) - (Char.code 'A'));(
+      (Char.code s.[0]) - (Char.code 'A'),
+      int_of_string (String.make 1 s.[1]),
+      match s.[2] with 
+      |'N' -> N 
+      |'O' -> O
+      |'S' -> S
+      |'E' -> E
+      | _ -> raise (Invalid_argument "error side")) 
+let rec get_player_act () : play = try string_to_play (read_line ()) with _ -> print_endline "Erreur de saisie. Ressaie !"; get_player_act ()
+
+let player_to_string (p : player) = 
+  match p with
+  | Player id -> "Joueur : " ^ string_of_int id
+  | Bot (id,_) -> "Bot : " ^ string_of_int id
+
+
+(* Vérifie que le coup est valide puis l'applique *)
+let act (p: player) ((x,y,s) : play) (gs: game_state) : outcome = 
+  if check_play gs.map (x,y,s) then (
+
+    let id = get_player_id p in 
+    let box_completed = place_wall gs.map x y s id in (* execute le coup *)
     
+    if is_full gs.map then 
+      Endgame (Some p) 
+    else(
+      if box_completed then update_score gs.score id;
+      Next {
+        score = gs.score;
+        player_list = gs.player_list;
+        next_player = get_next_player gs.player_list gs.next_player;
+        map = gs.map
+      })
+  ) else (
+    match p with
+    | Player _ -> print_endline "Vous vous êtes tromper"; Next gs   (* Le joueur à le droit de se tromper *)
+    | Bot _-> Error "Un n'a pas le droit de se tromper" (* Le bot ne rejoue pas pour éviter les récursions infinies *)
+  )
 
-(* Effectue le tour d'un joueur, renvoie le resultat du tour 
-- Wrong : le joueur n'a pas su ou pu jouer au bout de ses 5 tentatives (cas de base pour qu'un bot ne boucle pas pendant son tour)
-- Ok : le coup est valide 
-- BoxCompleted : le joueur à complété une case *)
-let rec player_turn_play (m : map) ((id,strategy) : player) (attempt : int) =
-  if attempt >= 5 then Wrong 
-  else
-    (
-    print_message ("C'est au joueur " ^ string_of_int id ^ " de jouer : \n");
-    print_map m;
-    let mv = (match check_move m (strategy m) with
-    | Error -> print_message "Le coup n'est pas valide, Réessaie !\n" ;player_turn_play m (id,strategy) (attempt +1) (*Pourquoi les print_message ne se font pas ici ?*)
-    | Move (x,y,z) ->  if do_move m (Move (x,y,z)) then BoxCompleted else Ok) in 
-    mv
-    ) 
-    
+
+let rec game_loop outcome = 
+  match outcome with
+  | Next gs -> (
+      print_map gs.map;
+      let play = match gs.next_player with
+      | Player _ -> get_player_act ()
+      | Bot (_,bot) -> bot (view gs) in 
+      print_endline ("Le " ^ (player_to_string gs.next_player) ^ " joue"); 
+      game_loop (act gs.next_player play gs)
+    )
+  | Error s -> print_endline s; None
+  | Endgame player -> player 
   
 
-(* Une Partie : Prend une liste de joueurs et une grille de jeu et renvoie la liste des scores *)
-let play_game (players : player list) (m : map) = 
+let play_game (w: int) (h:int) (pl :player list) = 
+    match game_loop (Next (init_game_state w h pl)) with 
+    | None -> print_endline "pas de gagnant"
+    | Some x -> 
+      match x with
+      | Player id -> print_endline ("le joueur "^ string_of_int id ^" à gagné")
+      | Bot (id,_) -> print_endline ("le bot "^ string_of_int id ^ " à gagné");  
 
-  print_message "On lance une partie \n";
-
-
-  let rec play_step score =
-    if not (game_complet ()) then
-
-
-      let rec aux score player =  
-        match player_turn_play m player 0 with
-        | Wrong -> print_message "Le joueur n'a pas pu jouer \n"; score;
-        | Ok -> score;
-        | BoxCompleted -> print_message "Tu as complété une case, tu peux rejouer\n"; aux (update_score score (fst player)) player
-      in 
-      
-      let score = List.fold_left aux 
-        score players in
-
-    play_step score 
-    else score
-  in 
-
-  play_step (List.init ((List.length players) + 1) (fun _ -> 0))

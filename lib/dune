@@ -1,3 +1,4 @@
 (library
  (name dnb)
- (public_name dnb.lib))
+ (public_name dnb.lib)
+ (modules map perlin game player))
