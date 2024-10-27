@@ -1,5 +1,9 @@
 open Stdlib
 
+(* Ce module permet de générer des grilles de booléens aléatoires de manière 
+ * procédurale en utilisant du bruit de Perlin.
+ * cf : https://en.wikipedia.org/wiki/Perlin_noise *)
+
 let fade (t : float) = t *. t *. t *. (t *. (t *. 6. -. 15.) +. 10.)
 
 let lin_interp t a b = a +. t *. (b -. a)

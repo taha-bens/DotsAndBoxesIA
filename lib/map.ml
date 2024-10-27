@@ -1,5 +1,9 @@
 open Perlin
 
+(* Ce module permet de modéliser le plateau de jeu. Il contient des        
+ * fonctions de génération de map, des fonctions permettant la manipulation d'une 
+ * map par un module exerne et des fonctions d'affichage. *)
+
 (* Types et exceptions ----------------------------------------------------- *)
 (* Les maps sont représentées par tableaux 2D de cellules composées de quatre
 * murs et d'un contenu. Les cases qui sont interdites sont les Blocks, les  
@@ -226,6 +230,8 @@ let is_legal (m : map) (p : play) =
 	else
 		not (get_wall_val (get_cell i j m) s)
 
+(* Exécute un play, renvoie true si une case a été complétée *)
+(* TODO : compter le nombre de cases qui ont été complétées *)
 let apply_play (m : map) (p : play) id =
 	let (i, j, s) = p in
 	let c = get_cell i j m in
