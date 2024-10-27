@@ -22,15 +22,15 @@ let string_to_move (s : string) : Game.play =
 (* (* Crée la liste des joueurs de la partie (bots compris) *)
 let rec make_player_list () : player list = 
 
-  print_string "récup des données \nCombien de joueurs ?" ;
+  print_message "récup des données \nCombien de joueurs ?" ;
   let n = read_int_opt () in (*n doit être un entier*)
   let l = match n with
-  | None -> (print_string "On demande un entier !\n";
+  | None -> (print_message "On demande un entier !\n";
             make_player_list ())
   | Some n -> (
 
 
-    print_string "Quels bots ?";
+  print_message "Quels bots ?";
     let botslist = let s = read_line () in if s = "" || s = " " then [] else String.split_on_char ',' s in   (*Gérer les cas sans bots ( '' )*)
     
     let l = 
@@ -45,7 +45,7 @@ let rec make_player_list () : player list =
 
 
     if (List.length l) < 2 then (
-      print_string "On ne peut pas jouer seul au jeu\n";
+      print_message "On ne peut pas jouer seul au jeu\n";
       make_player_list ();
     )
     else
