@@ -9,7 +9,7 @@ type player = Player of int | Bot of int * bot
 type game_state = {
 	score : int array; 
 	player_list : player list; 
-	next_player : player; 
+	cur_player : player; 
 	map : Map.map }
 type outcome = 
 | Next of game_state
@@ -28,7 +28,7 @@ let get_player_id p =
 	| Player id -> id 
 	| Bot (id,_) -> id
 
-let get_next_player (pl : player list) (p : player) = 
+let get_cur_player (pl : player list) (p : player) = 
 	List.nth pl ((get_player_id p + 1) mod List.length pl)
 
 
@@ -61,7 +61,7 @@ let print_game_state (gs : game_state) =
 		"Type"::(List.init (List.length pl) (fun i -> (match List.nth pl i with | Player _ -> "Player" | Bot _ -> "Bot")));
 		"Id"::(List.init (List.length pl) (fun i -> string_of_int (get_player_id (List.nth pl i))));
 		"Score":: (List.init (List.length pl) (fun i -> string_of_int gs.score.(i)));
-		"Is playing":: (List.init (List.length pl) (fun i -> if gs.next_player = (List.nth pl i) then "X" else ""));
+		"Is playing":: (List.init (List.length pl) (fun i -> if gs.cur_player = (List.nth pl i) then "X" else ""));
 	] in
 	clear_and_print (box_grid grid) (*Mettre l'affichage de la map ici *)
 
@@ -70,14 +70,14 @@ let print_game_state (gs : game_state) =
 let init_game_state (w: int) (h:int) (pl :player list) = 
 	{score = Array.make (List.length pl) 0;
 	player_list = pl; 
-	next_player = List.nth pl 0; 
+	cur_player = List.nth pl 0; 
 	map = random_map w h} 
 
-let rec get_player_act () : play = 
+let rec get_player_play () : play = 
 	try play_of_string (read_line ()) 
 	with _ -> 
 		print_endline (box_string "Erreur de saisie. Ressaie !"); 
-		get_player_act ()
+		get_player_play ()
 
 
 (* Vérifie que le coup est valide puis l'applique *)
@@ -92,7 +92,7 @@ let act (p: player) ((x,y,s) : play) (gs: game_state) : outcome =
 			Next {
 				score = gs.score;
 				player_list = gs.player_list;
-				next_player = get_next_player gs.player_list gs.next_player;
+				cur_player = get_cur_player gs.player_list gs.cur_player;
 				map = gs.map
 			}
 		)
@@ -106,11 +106,12 @@ let rec game_loop outcome =
 	| Next gs -> (
 			print_game_state gs;
 			print_endline(Buffer.contents (buf_of_map gs.map));
-			let play = match gs.next_player with
-			| Player _ -> get_player_act ()
-			| Bot (_, bot) -> bot (view gs) in 
-			print_mess ("Le joueur " ^ (string_of_player gs.next_player) ^ " joue"); 
-			game_loop (act gs.next_player play gs)
+			(let play = 
+				match gs.cur_player with
+				| Player _ -> get_player_play ()
+				| Bot (_, bot) -> bot (view gs) in 
+				print_mess ("Le joueur " ^ (string_of_player gs.cur_player) ^ " joue"); 
+				game_loop (act gs.cur_player play gs))
 		)
 	| Error s -> print_mess s; None
 	| Endgame player -> player 

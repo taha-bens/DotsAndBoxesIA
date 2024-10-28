@@ -145,8 +145,8 @@ let buf_of_line line (m : map) =
 	let len = 6 + 7 * m.width + 1 + 1 in
 	if line = -1 then
 		let buf = Buffer.create len in
-			for i = 0 to m.width do 
-				(if i = 0 then Buffer.add_string buf "      "
+			for i = -1 to m.width-1 do 
+				(if i = -1 then Buffer.add_string buf "      "
 				else if i < 10 then Buffer.add_string buf ("   " ^ (string_of_int i) ^ "   ")
 				else Buffer.add_string buf ("  " ^ (string_of_int i) ^ "   "))
 			done;
@@ -158,8 +158,7 @@ let buf_of_line line (m : map) =
 		let buf3 = Buffer.create len in
 
 		(Buffer.add_string buf1 "      ";
-		(if line < 10 then Buffer.add_string buf2 ("   " ^ (string_of_int line) ^ "  ")
-		else Buffer.add_string buf2 ("  " ^ (string_of_int line) ^ "  "));
+		Buffer.add_string buf2 ("   " ^ (String.make 1 (Char.chr ((Char.code 'A') + line))) ^ "  ");
 		Buffer.add_string buf3 "      ");
 
 		(for i = 0 to (m.width-1) do
