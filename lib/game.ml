@@ -52,8 +52,8 @@ let play_of_string (s : string) : play = (
 
 let string_of_player (p : player) = 
 	match p with
-	| Player id -> "Joueur : " ^ string_of_int id
-	| Bot (id, _) -> "Bot : " ^ string_of_int id
+	| Player id -> string_of_int id
+	| Bot (id, _) -> string_of_int id
 
 let print_game_state (gs : game_state) = 
 	let pl = gs.player_list in 
@@ -62,8 +62,9 @@ let print_game_state (gs : game_state) =
 		"Id"::(List.init (List.length pl) (fun i -> string_of_int (get_player_id (List.nth pl i))));
 		"Score":: (List.init (List.length pl) (fun i -> string_of_int gs.score.(i)));
 		"Is playing":: (List.init (List.length pl) (fun i -> if gs.cur_player = (List.nth pl i) then "X" else ""));
-	] in
-	clear_and_print (box_grid grid) (*Mettre l'affichage de la map ici *)
+	] in 
+	print_endline (box_grid grid);
+	print_endline(Buffer.contents (buf_of_map gs.map))
 
 
 (* Fonctions relatives au déroulement de la partie ------------------------- *)
@@ -76,8 +77,8 @@ let init_game_state (w: int) (h:int) (pl :player list) =
 let rec get_player_play () : play = 
 	try play_of_string (read_line ()) 
 	with _ -> 
-		print_endline (box_string "Erreur de saisie. Ressaie !"); 
-		get_player_play ()
+		(print_endline (box_string "Erreur de saisie. Ressaie !"); 
+		get_player_play ())
 
 
 (* Vérifie que le coup est valide puis l'applique *)
@@ -104,13 +105,14 @@ let act (p: player) ((x,y,s) : play) (gs: game_state) : outcome =
 let rec game_loop outcome = 
 	match outcome with
 	| Next gs -> (
-			print_game_state gs;
-			print_endline(Buffer.contents (buf_of_map gs.map));
+			clear_terminal ();
+			print_game_state gs; 
 			(let play = 
 				match gs.cur_player with
-				| Player _ -> get_player_play ()
+				| Player _ -> 
+					print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
+					get_player_play ()
 				| Bot (_, bot) -> bot (view gs) in 
-				print_mess ("Le joueur " ^ (string_of_player gs.cur_player) ^ " joue"); 
 				game_loop (act gs.cur_player play gs))
 		)
 	| Error s -> print_mess s; None

@@ -36,31 +36,29 @@ let box_grid grid =
 			else acc
 		) 0 grid
 	in
-
 	(* Fonction pour créer une ligne horizontale *)
 	let horizontal_line widths =
 		"+" ^ (List.fold_left (fun acc w -> acc ^ (String.make (w + 2) '-') ^ "+") "" widths)
 	in
-
 	(* Fonction pour créer une ligne de contenu *)
 	let content_line row widths =
 		"|" ^ (List.fold_left2 (fun acc s w -> 
 		acc ^ " " ^ s ^ (String.make (w - String.length s + 1) ' ') ^ "|"
 		) "" row widths)
-	in if grid = [] then "" else
-	
-	let num_columns = List.fold_left (fun acc row -> max acc (List.length row)) 0 grid in
-	let widths = List.init num_columns max_width_column in
-	let h_line = horizontal_line widths in
-	h_line ^ "\n" ^
-	(String.concat ("\n" ^ h_line ^ "\n") 
-		(List.map (fun row -> 
-		content_line (List.map2 (fun cell width -> 
-			if cell = "" then String.make width ' ' else cell
-		) (row @ List.init (num_columns - List.length row) (fun _ -> "")) widths) 
-		widths
-		) grid)) ^
-	"\n" ^ h_line
-
+	in 
+	if grid = [] then "" 
+	else
+		let num_columns = List.fold_left (fun acc row -> max acc (List.length row)) 0 grid in
+		let widths = List.init num_columns max_width_column in
+		let h_line = horizontal_line widths in
+		h_line ^ "\n" ^
+		(String.concat ("\n" ^ h_line ^ "\n") 
+			(List.map (fun row -> 
+			content_line (List.map2 (fun cell width -> 
+				if cell = "" then String.make width ' ' else cell
+			) (row @ List.init (num_columns - List.length row) (fun _ -> "")) widths) 
+			widths
+			) grid)) ^
+		"\n" ^ h_line
 
 let print_grid grid = clear_and_print (box_grid grid)
