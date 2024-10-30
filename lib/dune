@@ -1,4 +1,4 @@
 (library
  (name dnb)
  (public_name dnb.lib)
- (modules map perlin game player display))
+ (modules map perlin game player display bots))

@@ -3,9 +3,11 @@ open Display
 
 
 (* Types et exceptions ----------------------------------------------------- *)
-type game_view = Gameview (* A voir *)
+type game_view = cell array array (* A voir *)
 type bot = game_view -> play
-type player = Player of int | Bot of int * bot
+type player = 
+| Player of int 
+| Bot of int * bot
 type game_state = {
 	score : int array; 
 	player_list : player list; 
@@ -37,7 +39,7 @@ let nth_letter n =
 	if n < 1 || n > 26 then
 		None (*failwith "Le nombre doit être compris entre 1 et 26"*)
 	else
-		Some (Char.chr (64 + n))
+		Some (Char.chr (Char.code 'A' + n))
 
 (* Attention, ne gère pas si la hauteur est > 10 *)
 let play_of_string (s : string) : play = (
@@ -123,5 +125,5 @@ let play_game (w: int) (h: int) (pl : player list) =
 	| None -> print_mess "Égalité !"
 	| Some x -> 
 	match x with
-	| Player id -> print_mess ("Le joueur "^ string_of_int id ^" a gagné !")
+	| Player id -> print_mess ("Le joueur "^ string_of_int id ^ " a gagné !")
 	| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");  

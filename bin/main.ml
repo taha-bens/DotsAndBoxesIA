@@ -1,33 +1,59 @@
-
-(*open Dnb.Map*)
 open Dnb.Game
 open Dnb.Display
-(*open Dnb.Player*)
 
-(* prend un nombre de joueurs "terminal" et une liste de bots et renvoie la liste des joueur pour la partie *)
-let make_player_list (nb_players : int) (botslist : bot list) : player list = 
-	List.init nb_players (fun i -> Player i) @ List.mapi (fun i b -> Bot (nb_players + i + 1,b)) botslist
+let (botList : bot list) = []
+let get_bot_by_id = List.nth botList
 
-let rec get_int (mess : string) (mess_error : string) = 
-	print_mess mess; 
-	match read_int_opt () with
-	| None -> get_int mess_error mess_error  
-	| Some n -> n
+let rec get_input_dimensions () =
+	print_string "Choisissez les dimensions du plateau \"largeur,hauteur\" : ";
+	let input = read_line () in
+	let dims = String.split_on_char ',' input in
+	if List.length dims <> 2 then
+		(print_endline "\nMauvaise saisie, réessayez";
+		get_input_dimensions ())
+	else
+		try 
+			let w = int_of_string (List.nth dims 0) in
+			let h = int_of_string (List.nth dims 1) in
+			if w < 2 || h < 2 then (
+				print_endline "Les dimensions doivent être supérieures à 1";
+				get_input_dimensions ()
+			)
+			else (w, h)
+		with _ ->
+			(print_endline "\nMauvaise saisie, réessayez";
+			get_input_dimensions ())
+
+let rec get_player_bot_numbers () = 
+	print_string "Choisissez le nombre de joueurs et de bots \"joueurs, bots, idBot1, ..., idBotN\" : ";
+	let input = read_line () in
+	try 
+		let numbers = List.map int_of_string (String.split_on_char ',' input) in
+		if List.for_all (fun v -> v >= 0) numbers && (List.length numbers) = 2 + (List.nth numbers 1) then
+			numbers
+		else 
+			(print_endline "\nMauvaise saisie, réessayez";
+			get_player_bot_numbers ())
+	with _ ->
+		(print_endline "\nMauvaise saisie, réessayez";
+		get_player_bot_numbers ())
+	
 
 (* Boucle principale du jeu *)
 let rec main_loop continue =
 	if continue then (
 		clear_and_print game_name;
 		prerr_endline "'Entrer' pour lancer une partie";
+		let _ = read_line () in
+		clear_terminal ();
 
-		let _ = read_line () in 
-		let mess_error = "mauvaise saisie ! Réessaie !" in 
-		let w = get_int "largeur de la map : " mess_error in 
-		let h = get_int "hauteur de la map : " mess_error in
-		let nb_p = get_int "nombre de joueurs : " mess_error in 
-		print_mess "On lance la partie ";
-
-		play_game w h (make_player_list nb_p [fun _ -> (2,3,N)]);
+		let (w, h) = get_input_dimensions () in
+		clear_terminal ();
+		let argv = get_player_bot_numbers () in
+		clear_terminal ();
+		let nb_p, nb_b = List.nth argv 0, List.nth argv 1 in
+		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i)))) in
+		play_game w h player_list;
 
 		print_mess "Voulez-vous jouer à nouveau ? (o/n) :";
 		main_loop (match read_line () with
