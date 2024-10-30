@@ -56,7 +56,7 @@ let play_of_string (s : string) : play = (
 let string_of_player (p : player) = 
 	match p with
 	| Player id -> string_of_int id
-	| Bot (id, _) -> string_of_int id
+	| Bot (id, b) -> print_endline "test"; string_of_int id
 
 let print_game_state (gs : game_state) = 
 	let pl = gs.player_list in 
@@ -127,7 +127,7 @@ let rec game_loop outcome =
 					get_player_play ())
 				| Bot (_, b) -> 
 					(print_endline "here";
-					(0, 0, N))
+					b (view gs))
 			in game_loop (act gs.cur_player play gs)
 		)
 	| Error s -> (print_mess s; None)
