@@ -56,7 +56,7 @@ let play_of_string (s : string) : play = (
 let string_of_player (p : player) = 
 	match p with
 	| Player id -> string_of_int id
-	| Bot (id, b) -> print_endline "test"; string_of_int id
+	| Bot (id, _) -> print_endline "test"; string_of_int id
 
 let print_game_state (gs : game_state) = 
 	let pl = gs.player_list in 
