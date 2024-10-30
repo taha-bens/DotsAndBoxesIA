@@ -7,13 +7,13 @@ let game_name =
 	"| |__| || (_) || |_ \\__ \\  / ____ \\ | | | || (_| | | |_) || (_) | >  < |  __/\\__ \\  \n"^
 	"|_____/  \\___/  \\__||___/ /_/    \\_\\|_| |_| \\__,_| |____/  \\___/ /_/\\_\ \\___||___/   \n"
 
-let clear_terminal () =
-	if Sys.os_type = "Unix" then
+let clear_terminal () = ()
+	(*if Sys.os_type = "Unix" then
 		ignore (Sys.command "clear")
 	else if Sys.os_type = "Win32" then
 		ignore (Sys.command "cls")
 	else
-		Printf.printf "\027[2J\027[H"
+		Printf.printf "\027[2J\027[H"*)
 
 let box_string str =
 	let len = String.length str in

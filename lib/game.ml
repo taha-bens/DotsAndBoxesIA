@@ -13,7 +13,7 @@ type game_state = {
 	score : int array; 
 	player_list : player list; 
 	cur_player : player; 
-	map : Map.map }
+	map : map }
 type outcome = 
 | Next of game_state
 | Error of string 
@@ -31,7 +31,7 @@ let get_player_id p =
 	| Player id -> id 
 	| Bot (id,_) -> id
 
-let get_cur_player (pl : player list) (p : player) = 
+let get_next_player (pl : player list) (p : player) = 
 	List.nth pl ((get_player_id p + 1) mod List.length pl)
 
 
@@ -85,46 +85,58 @@ let rec get_player_play () : play =
 
 
 (* Vérifie que le coup est valide puis l'applique *)
-let act (p: player) ((x,y,s) : play) (gs: game_state) : outcome = 
-	if is_legal gs.map (x, y, s) then
+let act (p: player) (play : play) (gs: game_state) : outcome = 
+	if is_legal gs.map play then
 		let id = get_player_id p in 
-		let box_completed = apply_play gs.map (x, y, s) id in (* execute le coup *)
-		if is_full gs.map then 
-			Endgame (Some p) 
-		else (
-			if box_completed then update_score gs.score id;
+		(* TODO : gérer le cas où deux cases sont complétées en même temps, éventuellement déplacer apply_play dans game *)
+		let box_completed = apply_play gs.map play id in
+		if box_completed then (
+			update_score gs.score id;
+			if is_full gs.map then
+				Endgame(Some p)
+			else
+				Next {
+					score = gs.score;
+					player_list = gs.player_list;
+					cur_player = gs.cur_player;
+					map = gs.map
+				})
+		else 
 			Next {
 				score = gs.score;
 				player_list = gs.player_list;
-				cur_player = get_cur_player gs.player_list gs.cur_player;
+				cur_player = get_next_player gs.player_list gs.cur_player;
 				map = gs.map
 			}
-		)
 	else
 		match p with
-		| Player _ -> print_mess "Vous vous êtes trompé"; Next gs   (* Le joueur à le droit de se tromper *)
+		| Player _ -> print_endline "Vous vous êtes trompé"; Next gs   (* Le joueur à le droit de se tromper *)
 		| Bot _-> Error "Un bot n'a pas le droit de se tromper" (* Le bot ne rejoue pas pour éviter les récursions infinies *)
 
 let rec game_loop outcome = 
+	print_endline "debug";
 	match outcome with
 	| Next gs -> (
+			print_endline "debugb";
 			clear_terminal ();
 			print_game_state gs; 
-			(let play = 
+			let play = 
 				match gs.cur_player with
 				| Player _ -> 
-					print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
-					get_player_play ()
-				| Bot (_, b) -> b (view gs) 
-			in game_loop (act gs.cur_player play gs))
+					(print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
+					get_player_play ())
+				| Bot (_, b) -> 
+					(print_endline "here";
+					(0, 0, N))
+			in game_loop (act gs.cur_player play gs)
 		)
 	| Error s -> (print_mess s; None)
-	| Endgame player -> player 
+	| Endgame player_opt -> player_opt
 
 let play_game (w: int) (h: int) (pl : player list) = 
 	match game_loop (Next (init_game_state w h pl)) with 
 	| None -> print_mess "Égalité !"
 	| Some x -> 
-	match x with
-	| Player id -> print_mess ("Le joueur "^ string_of_int id ^ " a gagné !")
-	| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");  
+		match x with
+		| Player id -> print_mess ("Le joueur "^ string_of_int id ^ " a gagné !")
+		| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");  
