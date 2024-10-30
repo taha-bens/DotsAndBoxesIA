@@ -44,7 +44,7 @@ let rec get_player_bot_numbers () =
 let rec main_loop continue =
 	if continue then (
 		clear_and_print game_name;
-		prerr_endline "'Entrer' pour lancer une partie";
+		print_string "'Entrer' pour lancer une partie : ";
 		let _ = read_line () in
 		clear_terminal ();
 
