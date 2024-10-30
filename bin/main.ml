@@ -2,6 +2,13 @@ open Dnb.Game
 open Dnb.Display
 open Dnb.Bots
 
+(* Module pricipal du programme qui gère les premières interactions
+ * et le lancement de la partie.
+ * Une partie peut se faire entre joueurs, entre joueurs et bots, et entre bots
+ * Chaque "stratégie" de bot est stockée dans la liste botList, 
+ * lui attribuant un id en fonction de l'indice dans cette dernière.
+*)
+
 let (botList : bot list) = [stupid_bot]
 let get_bot_by_id = List.nth botList
 
@@ -56,7 +63,7 @@ let rec main_loop continue =
 		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_p)))) in
 		play_game w h player_list;
 
-		print_mess "Voulez-vous jouer à nouveau ? (o/n) :";
+		print_endline "Voulez-vous jouer à nouveau ? (o/n) :";
 		main_loop (match read_line () with
 		| "o" | "O" | "oui" | "Oui" -> true
 		| _ -> false)

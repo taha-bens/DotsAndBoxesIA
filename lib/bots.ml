@@ -1,6 +1,13 @@
 open Game
 open Map
 
+(* Module pour les "stratégies" des bots.
+ * Chaque stratégie conçu doit être renseignée dans botList (main.ml) 
+ * pour qu'elle puisse être utilisée en partie.
+ *)
+
+ 
+(* Exemple de bot stupid *)
 let stupid_bot : bot =
 	fun (gv : game_view) ->
 		if is_full gv then 

@@ -2,9 +2,15 @@ open Map
 open Display
 
 
+(* Ce module permet de gérer le déroulement d'une partie
+ * fonctions principales du module :
+ * play_game : s'occupe du lancement de la partie
+ * game_loop : s'occupe fonctionnement tour par tours
+ * act : applique le coup spécifique d'un joueur sur l'état du jeu
+*)
+
 (* Types et exceptions ----------------------------------------------------- *)
-type game_view = map (* A voir *)
-let map_of_game_view : game_view -> map = fun x -> x
+type game_view = map
 type bot = game_view -> play
 type player = 
 | Player of int 
@@ -36,11 +42,6 @@ let get_next_player (pl : player list) (p : player) =
 
 
 (* Fonctions utilitaires --------------------------------------------------- *)
-let nth_letter n =
-	if n < 1 || n > 26 then
-		None (*failwith "Le nombre doit être compris entre 1 et 26"*)
-	else
-		Some (Char.chr (Char.code 'A' + n))
 
 (* Attention, ne gère pas si la hauteur est > 10 *)
 let play_of_string (s : string) : play = (
