@@ -1,7 +1,8 @@
 open Dnb.Game
 open Dnb.Display
+open Dnb.Bots
 
-let (botList : bot list) = []
+let (botList : bot list) = [stupid_bot]
 let get_bot_by_id = List.nth botList
 
 let rec get_input_dimensions () =
@@ -25,7 +26,7 @@ let rec get_input_dimensions () =
 			get_input_dimensions ())
 
 let rec get_player_bot_numbers () = 
-	print_string "Choisissez le nombre de joueurs et de bots \"joueurs, bots, idBot1, ..., idBotN\" : ";
+	print_string "Choisissez le nombre de joueurs et de bots \"joueurs,bots,idBot1,...,idBotN\" : ";
 	let input = read_line () in
 	try 
 		let numbers = List.map int_of_string (String.split_on_char ',' input) in
@@ -52,7 +53,7 @@ let rec main_loop continue =
 		let argv = get_player_bot_numbers () in
 		clear_terminal ();
 		let nb_p, nb_b = List.nth argv 0, List.nth argv 1 in
-		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i)))) in
+		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_b)))) in
 		play_game w h player_list;
 
 		print_mess "Voulez-vous jouer à nouveau ? (o/n) :";

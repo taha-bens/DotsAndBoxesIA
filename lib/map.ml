@@ -34,7 +34,21 @@ let cells_equal c1 c2 =
 
 let maps_equal m1 m2 = 
 	grids_equal m1.content m2.content
-															
+
+let side_of_int i =
+	match i with 
+	| 0 -> N
+	| 1 -> O
+	| 2 -> S
+	| _ -> E (* Bof, bof... *)
+
+let int_of_side s =
+	match s with
+	| N -> 0
+	| O -> 1
+	| S -> 2
+	| E -> 3
+
 
 (* Getters/Setters --------------------------------------------------------- *)
 let get_cell i j m = m.content.(i).(j)
@@ -43,26 +57,18 @@ let get_walls (c : cell) = c.walls
 	
 (* Renvoie la référence du mur *)
 let get_wall (c : cell) (s : side) =
-	match s with
-	| N -> c.walls.(0)
-	| O -> c.walls.(1)
-	| S -> c.walls.(2)
-	| E -> c.walls.(3) 
+	c.walls.(int_of_side s)
 		
 (* Renvoie la valeur du mur *)
 let get_wall_val (c : cell) (s : side) = !(get_wall c s)
 		
-let set_wall (c : cell) (s : side) value = (get_wall c s) := value
+let set_wall_val (c : cell) (s : side) value = (get_wall c s) := value
 
 (* On ne peut pas utiliser la fonction get_wall ici
 * car le résultat de get_wall est une valeur et pas
 * une variable modifiable. *)
 let set_wall_ref (c : cell) (s : side) bool_ref =
-	match s with
-	| N -> c.walls.(0) <- bool_ref
-	| O -> c.walls.(1) <- bool_ref
-	| S -> c.walls.(2) <- bool_ref
-	| E -> c.walls.(3) <- bool_ref
+	c.walls.(int_of_side s) <- bool_ref
 
 let get_ctype (c : cell) = c.ctype
 
@@ -114,6 +120,26 @@ let fill_map (m : map) =
 		s_arr) 
 	m.content);
 	m
+
+let copy_map m =
+	let w = m.width in
+	let h = m.height in
+	let n_map = empty_map w h in
+	Array.iteri
+		(fun i s_arr -> Array.iteri
+			(fun j n_cell -> 
+				let c = get_cell i j m in
+				Array.iteri (fun k w -> set_wall_val n_cell (side_of_int k) !w) c.walls)
+		s_arr)
+	n_map.content;
+	n_map
+
+let get_unwalled_side (c : cell) : side option =
+	if is_full_cell c then None
+	else if get_wall_val c N then Some(N)
+	else if get_wall_val c O then Some(O)
+	else if get_wall_val c S then Some(S)
+	else Some(E)
 
 
 (* Fonctions de génération de map ------------------------------------------ *)
@@ -234,7 +260,7 @@ let is_legal (m : map) (p : play) =
 let apply_play (m : map) (p : play) id =
 	let (i, j, s) = p in
 	let c = get_cell i j m in
-	set_wall c s true;
+	set_wall_val c s true;
 	if is_full_cell c then (set_ctype c (CompletedBy(id)); true)
 	else false
 

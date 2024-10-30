@@ -3,7 +3,8 @@ open Display
 
 
 (* Types et exceptions ----------------------------------------------------- *)
-type game_view = cell array array (* A voir *)
+type game_view = map (* A voir *)
+let map_of_game_view : game_view -> map = fun x -> x
 type bot = game_view -> play
 type player = 
 | Player of int 
@@ -17,8 +18,8 @@ type outcome =
 | Next of game_state
 | Error of string 
 | Endgame of player option
-let view (_ : game_state) : game_view = Gameview
-let display (_ :game_view): unit = ()
+let view (gs : game_state) : game_view = copy_map gs.map
+let display (gv : game_view): unit = print_endline (Buffer.contents (buf_of_map gv))
 
 
 (* Getters/Setters --------------------------------------------------------- *)
@@ -114,10 +115,10 @@ let rec game_loop outcome =
 				| Player _ -> 
 					print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
 					get_player_play ()
-				| Bot (_, bot) -> bot (view gs) in 
-				game_loop (act gs.cur_player play gs))
+				| Bot (_, b) -> b (view gs) 
+			in game_loop (act gs.cur_player play gs))
 		)
-	| Error s -> print_mess s; None
+	| Error s -> (print_mess s; None)
 	| Endgame player -> player 
 
 let play_game (w: int) (h: int) (pl : player list) = 
