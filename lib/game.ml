@@ -53,10 +53,17 @@ let play_of_string (s : string) : play = (
 	|'E' -> E
 	| _ -> raise (Invalid_argument "error side"))
 
-let string_of_player (p : player) = 
+let print_play (p : play) =
+	let (i, j, s) = p in
+	print_endline ("(" ^ (string_of_int i) ^", " ^ (string_of_int j) ^ ", " ^ (string_of_int (int_of_side s)) ^ ")")
+
+let get_player_id (p : player) = 
 	match p with
-	| Player id -> string_of_int id
-	| Bot (id, _) -> print_endline "test"; string_of_int id
+	| Player(k) -> k
+	| Bot(k, _) -> k
+
+let string_of_player (p : player) =
+	string_of_int (get_player_id p)
 
 let print_game_state (gs : game_state) = 
 	let pl = gs.player_list in 
@@ -64,9 +71,10 @@ let print_game_state (gs : game_state) =
 		"Type"::(List.init (List.length pl) (fun i -> (match List.nth pl i with | Player _ -> "Player" | Bot _ -> "Bot")));
 		"Id"::(List.init (List.length pl) (fun i -> string_of_int (get_player_id (List.nth pl i))));
 		"Score":: (List.init (List.length pl) (fun i -> string_of_int gs.score.(i)));
-		"Is playing":: (List.init (List.length pl) (fun i -> if gs.cur_player = (List.nth pl i) then "X" else ""));
+		"Is playing":: (List.init (List.length pl) (fun i -> if (get_player_id gs.cur_player) = i then "X" else ""));
 	] in 
 	print_endline (box_grid grid);
+	print_endline "";
 	print_endline(Buffer.contents (buf_of_map gs.map))
 
 
@@ -114,10 +122,8 @@ let act (p: player) (play : play) (gs: game_state) : outcome =
 		| Bot _-> Error "Un bot n'a pas le droit de se tromper" (* Le bot ne rejoue pas pour éviter les récursions infinies *)
 
 let rec game_loop outcome = 
-	print_endline "debug";
 	match outcome with
 	| Next gs -> (
-			print_endline "debugb";
 			clear_terminal ();
 			print_game_state gs; 
 			let play = 
@@ -125,8 +131,13 @@ let rec game_loop outcome =
 				| Player _ -> 
 					(print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
 					get_player_play ())
-				| Bot (_, b) -> 
-					(print_endline "here";
+				| Bot (id, b) -> 
+					(print_string ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
+					for _ = 0 to 10 do 
+						(print_char '.';
+						flush stdout;
+						Unix.sleepf 0.15)
+					done;
 					b (view gs))
 			in game_loop (act gs.cur_player play gs)
 		)
@@ -139,4 +150,4 @@ let play_game (w: int) (h: int) (pl : player list) =
 	| Some x -> 
 		match x with
 		| Player id -> print_mess ("Le joueur "^ string_of_int id ^ " a gagné !")
-		| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");  
+		| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");

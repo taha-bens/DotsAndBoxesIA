@@ -52,8 +52,8 @@ let rec main_loop continue =
 		clear_terminal ();
 		let argv = get_player_bot_numbers () in
 		clear_terminal ();
-		let nb_p, nb_b = List.nth argv 0, List.nth argv 1 in
-		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_b)))) in
+		let (nb_p, nb_b) = (List.nth argv 0, List.nth argv 1) in
+		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_p)))) in
 		play_game w h player_list;
 
 		print_mess "Voulez-vous jouer à nouveau ? (o/n) :";

@@ -1,4 +1,4 @@
 (executable
 	(name main)
 	(public_name main)
-	(libraries dnb.lib))
+	(libraries dnb.lib unix))

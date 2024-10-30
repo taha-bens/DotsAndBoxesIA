@@ -136,9 +136,9 @@ let copy_map m =
 
 let get_unwalled_side (c : cell) : side option =
 	if is_full_cell c then None
-	else if get_wall_val c N then Some(N)
-	else if get_wall_val c O then Some(O)
-	else if get_wall_val c S then Some(S)
+	else if not (get_wall_val c N) then Some(N)
+	else if not (get_wall_val c O) then Some(O)
+	else if not (get_wall_val c S) then Some(S)
 	else Some(E)
 
 
