@@ -1,19 +1,27 @@
 open OUnit2
+open Test_game
+open Test_map
 
 let () = 
   let sequence = "test sequence" >::: [
     (*tests map module*)
-    (*"test_rfb" >:: Test_map.test_rfb;
-    "test_modify_string" >:: Test_map.test_modify_string;
-    "test_wfb" >:: Test_map.test_wfb;
-    "test_fill_map" >:: Test_map.test_fill_map;
-    "test_is_valid_map" >:: Test_map.test_is_valid_map;
-    *)
+    "test_side_of_int" >:: test_side_of_int;
+    "test_int_of_side" >:: test_int_of_side;
+    "test_is_full_cell" >:: test_is_full_cell;
+    "test_convert_to_block" >:: test_convert_to_block;
+    "test_is_full" >:: test_is_full;
+    "test_is_legale" >:: test_is_legale;
+    "test_apply_play" >:: test_apply_play;
 
+    QCheck_ounit.to_ounit2_test (test_maps_equal random_map_gen); 
+    QCheck_ounit.to_ounit2_test (test_maps_equal perlin_map_gen); 
+
+    
 
     (* tests game module *)
-    (* "test_nth_letter" >:: Test_game.test_nth_letter;
-    QCheck_ounit.to_ounit2_test (Test_game.test_check_move Test_game.random_map_gen); *)
+    "test_update_score" >:: test_update_score;
+    "test_play_of_string" >:: test_play_of_string;
 
+    QCheck_ounit.to_ounit2_test (test_get_player_id ()); 
 
   ] in run_test_tt_main sequence
