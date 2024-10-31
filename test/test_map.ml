@@ -53,14 +53,13 @@ let test_is_full _ =
   assert_equal (is_full m_full) true;
   assert_equal (is_full m_not_full) false
 
-  (* A revoir *)
-let test_is_legale _ = () 
-  (* let m = (empty_map 1 1) in 
+let test_is_legale _ = 
+  let m = (empty_map 1 1) in 
   assert_equal (is_legal m (-1,-1,N)) false;
   assert_equal (is_legal m (max_int,max_int,O)) false;
-  assert_equal (is_legal m (42,42,N)) false;
-  assert_equal (is_legal m (min_int,min_int,N)) true
- *)
+  assert_equal (is_legal m (42,42,N)) false
+
+
 let test_apply_play _ =
   assert_equal (apply_play (map1_template true true true false) (0,0,E) 0) true;
   assert_equal (apply_play (map1_template true false true false) (0,0,E) 0) false
