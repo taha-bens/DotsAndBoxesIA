@@ -22,6 +22,8 @@ let () =
     "test_update_score" >:: test_update_score;
     "test_play_of_string" >:: test_play_of_string;
 
+    "test_act" >:: test_act;
+
     QCheck_ounit.to_ounit2_test (test_get_player_id ()); 
 
   ] in run_test_tt_main sequence

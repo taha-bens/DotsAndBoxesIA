@@ -21,16 +21,30 @@ let test_play_of_string _ =
   assert_raises (Invalid_argument "error side") (fun () -> play_of_string "osejfpzqejf^")
 
 
-(* 
+(* très compliqué à tester car chaque partie est unique et indépendante *)
 let test_act _ =
-  let pl =  [Player 0;Player 1] in
-  let map = {width=1;height=1;content=[|[|{walls= [|ref false; ref false; ref true; ref false|];ctype = Void}|]|]} in 
+  let p1, p2 = Player 0, Player 1 in 
+  let pl =  [p1;p2] in
+  let map = {width=1;height=1;content=[|[|{walls= [|ref false; ref false; ref true; ref true|];ctype = Void}|]|]} in 
   let gs = {score = Array.make (List.length pl) 0;
 	player_list = pl; 
 	cur_player = List.nth pl 0; 
 	map = map} in 
-  act (Player 0) (0,0,N) gs  *)
 
+  (* test l'ajout d'un mur par p1 *)
+  match act (Player 0) (0,0,O) gs with 
+  | Next gs ->
+    assert_equal !(gs.map.content.(0).(0).walls.(1)) true;
+    assert_equal gs.cur_player p2
+  | Error _ -> ()
+  | Endgame _ -> ();
+
+  (* test la fin de partie avec p1 gagnant *)
+  match act (Player 0) (0,0,N) gs with 
+  | Next _ -> ()
+  | Error _ -> ()
+  | Endgame p -> match p with | None -> () | Some p -> assert_equal p p1
+ 
 
   
 
