@@ -63,7 +63,7 @@ let rec main_loop continue =
 		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_p)))) in
 		play_game w h player_list;
 
-		print_animated "Voulez-vous jouer à nouveau ? (o/n) :";
+		print_animated "\nVoulez-vous jouer à nouveau ? (o/n) :";
 		main_loop (match read_line () with
 		| "o" | "O" | "oui" | "Oui" -> true
 		| _ -> false)

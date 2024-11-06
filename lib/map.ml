@@ -35,6 +35,8 @@ let cells_equal c1 c2 =
 let maps_equal m1 m2 = 
 	grids_equal m1.content m2.content
 
+
+(* Getters/Setters --------------------------------------------------------- *)
 let side_of_int i =
 	match i with 
 	| 0 -> N
@@ -49,8 +51,13 @@ let int_of_side s =
 	| S -> 2
 	| E -> 3
 
+let string_of_side s =
+	match s with
+	| N -> "N"
+	| O -> "O"
+	| S -> "S"
+	| E -> "E"
 
-(* Getters/Setters --------------------------------------------------------- *)
 let get_cell i j m = m.content.(i).(j)
 					
 let get_walls (c : cell) = c.walls 
@@ -143,7 +150,7 @@ let get_unwalled_side (c : cell) : side option =
 
 (* Convertit un entier en une chaine de caractères de la forme [A-Z]+
  * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
- let letters_of_int (i : int) =
+let letters_of_int (i : int) =
 	let rec aux i acc = 
 		if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
 	else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
