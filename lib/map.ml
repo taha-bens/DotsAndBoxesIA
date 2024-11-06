@@ -141,6 +141,14 @@ let get_unwalled_side (c : cell) : side option =
 	else if not (get_wall_val c S) then Some(S)
 	else Some(E)
 
+(* Convertit un entier en une chaine de caractères de la forme [A-Z]+
+ * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
+ let letters_of_int (i : int) =
+	let rec aux i acc = 
+		if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
+	else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
+	in String.concat "" (aux i [])
+
 
 (* Fonctions de génération de map ------------------------------------------ *)
 let random_map w h =
@@ -184,7 +192,9 @@ let buf_of_line line (m : map) =
 		let buf3 = Buffer.create len in
 
 		(Buffer.add_string buf1 "      ";
-		Buffer.add_string buf2 ("   " ^ (String.make 1 (Char.chr ((Char.code 'A') + line))) ^ "  ");
+		Buffer.add_string buf2 ("   " ^ 
+			(let s = letters_of_int line in
+			(s ^ (String.make (3 - (String.length s)) ' '))));
 		Buffer.add_string buf3 "      ");
 
 		(for i = 0 to (m.width-1) do

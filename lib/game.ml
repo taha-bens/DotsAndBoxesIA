@@ -52,27 +52,16 @@ let get_best_player (gs : game_state) =
 	) gs.score;
 	!p
 
-(* Fonctions utilitaires --------------------------------------------------- *)
-
-(* Convertit un entier en une chaine de caractères de la forme [A-Z]+
- * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
-
- let letters_of_int (i : int) =
-	let rec aux i acc = 
-	  if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
-	  else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
-	in
-	String.concat "" (aux i [])
-	  
-  let int_of_letters (s : string) = 
+(* Fonctions utilitaires --------------------------------------------------- *)	  
+let int_of_letters (s : string) = 
 	let i = ref 0 in 
 	let len = String.length s in
 	String.iteri (fun j c -> 
 		if c < 'A' || c > 'Z' then raise (Invalid_argument "wrong input")
 		else if j = len-1 then
-		  i := !i + (Char.code c - Char.code 'A') + 1
+			i := !i + (Char.code c - Char.code 'A') + 1
 		else i := !i + (Char.code c - Char.code 'A' + 1) * 26
-	  ) s; 
+	) s; 
 	!i - 1
 
 let play_of_string (s : string) : play = 
