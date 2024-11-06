@@ -12,27 +12,27 @@ open Dnb.Bots
 let (botList : bot list) = [stupid_bot]
 let get_bot_by_id = List.nth botList
 
-let rec ask_input_dimensions (printed : bool) =
+let rec ask_user_dimensions (printed : bool) =
 	(if not printed then print_animated "Choisissez les dimensions du plateau \"largeur,hauteur\" : ");
 	let input = read_line () in
 	let dims = String.split_on_char ',' input in
 	if List.length dims <> 2 then
 		(print_animated "Mauvaise saisie, réessayez : ";
-		ask_input_dimensions true)
+		ask_user_dimensions true)
 	else
 		try 
 			let w = int_of_string (List.nth dims 0) in
 			let h = int_of_string (List.nth dims 1) in
 			if w < 2 || h < 2 then (
 				print_animated "Les dimensions doivent être supérieures à 1, réessayez : ";
-				ask_input_dimensions true
+				ask_user_dimensions true
 			)
 			else (w, h)
 		with _ ->
 			(print_animated "Mauvaise saisie, réessayez : ";
-			ask_input_dimensions true)
+			ask_user_dimensions true)
 
-let rec ask_player_bot_numbers (printed : bool) = 
+let rec ask_user_nb_players (printed : bool) = 
 	(if not printed then 
 		print_animated "Choisissez le nombre de joueurs et de bots \"joueurs,bots,idBot1,...,idBotN\" : ");
 	let input = read_line () in
@@ -42,10 +42,10 @@ let rec ask_player_bot_numbers (printed : bool) =
 			numbers
 		else 
 			(print_animated "Mauvaise saisie, réessayez : ";
-			ask_player_bot_numbers true)
+			ask_user_nb_players true)
 	with _ ->
 		(print_animated "Mauvaise saisie, réessayez : ";
-		ask_player_bot_numbers true)
+		ask_user_nb_players true)
 	
 
 (* Boucle principale du jeu *)
@@ -55,9 +55,9 @@ let rec main_loop continue =
 		let _ = print_and_wait "Appuyez sur 'Entrer' pour lancer la partie : " in
 		clear_terminal ();
 
-		let (w, h) = ask_input_dimensions false in
+		let (w, h) = ask_user_dimensions false in
 		clear_terminal ();
-		let argv = ask_player_bot_numbers false in
+		let argv = ask_user_nb_players false in
 		clear_terminal ();
 		let (nb_p, nb_b) = (List.nth argv 0, List.nth argv 1) in
 		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_p)))) in

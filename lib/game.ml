@@ -40,19 +40,55 @@ let get_player_id p =
 let get_next_player (pl : player list) (p : player) = 
 	List.nth pl ((get_player_id p + 1) mod List.length pl)
 
+let get_best_player (gs : game_state) =
+	let (p : player option ref) = ref None in
+	let (max : int ref) = ref (-1) in
+	Array.iteri 
+		(fun i s ->
+			if s > !max then
+				(p:=Some(Player i); max:= s)
+			else if s = !max then 
+				p:=None 
+	) gs.score;
+	!p
 
 (* Fonctions utilitaires --------------------------------------------------- *)
 
-(* Attention, ne gère pas si la hauteur est > 10 *)
-let play_of_string (s : string) : play = (
-	(Char.code s.[0]) - (Char.code 'A'),
-	int_of_string (String.make 1 s.[1]),
-	match s.[2] with 
-	|'N' -> N 
-	|'O' -> O
-	|'S' -> S
-	|'E' -> E
-	| _ -> raise (Invalid_argument "error side"))
+(* Convertit un entier en une chaine de caractères de la forme [A-Z]+
+ * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
+
+ let letters_of_int (i : int) =
+	let rec aux i acc = 
+	  if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
+	  else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
+	in
+	String.concat "" (aux i [])
+	  
+  let int_of_letters (s : string) = 
+	let i = ref 0 in 
+	let len = String.length s in
+	String.iteri (fun j c -> 
+		if c < 'A' || c > 'Z' then raise (Invalid_argument "wrong input")
+		else if j = len-1 then
+		  i := !i + (Char.code c - Char.code 'A') + 1
+		else i := !i + (Char.code c - Char.code 'A' + 1) * 26
+	  ) s; 
+	!i - 1
+
+let play_of_string (s : string) : play = 
+	let splitted = String.split_on_char ' ' s in
+	if List.length splitted <> 3 then raise (Invalid_argument "error play format")
+	else 
+		let i = int_of_letters (List.nth splitted 0) in
+		let j = int_of_string (List.nth splitted 1) in
+		let side = 
+			match List.nth splitted 2 with
+			| "N" -> N
+			| "O" -> O
+			| "S" -> S
+			| "E" -> E
+			| _ -> raise (Invalid_argument "error side")
+		in (i, j, side)
 
 let print_play (p : play) =
 	let (i, j, s) = p in
@@ -132,8 +168,6 @@ let rec game_loop outcome =
 				| Player _ -> 
 					(print_animated ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
 					get_player_play ())
-					(*(print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
-					get_player_play ())*)
 				| Bot (id, b) -> 
 					(print_animated ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
 					print_animatedf 1.5 "....................";
