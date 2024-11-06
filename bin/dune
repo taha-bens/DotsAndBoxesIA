@@ -1,4 +1,4 @@
 (executable
 	(name main)
 	(public_name main)
-	(libraries dnb.lib unix))
+	(libraries dnb.lib unix tsdl tsdl-mixer))

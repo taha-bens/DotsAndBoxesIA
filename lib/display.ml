@@ -1,4 +1,3 @@
-
 (* Module gérant l'affichage de jeu sur le terminal *)
 
 let game_name = 
@@ -63,4 +62,21 @@ let box_grid grid =
 			) grid)) ^
 		"\n" ^ h_line
 
-let print_grid grid = clear_and_print (box_grid grid)
+let print_grid grid = clear_and_print (box_grid grid)	
+
+let print_animatedf (duration : float) (s : string) =
+	let l = String.length s in
+	String.iter (
+		fun c -> (
+			print_char c;
+			flush stdout;
+			Unix.sleepf (duration /. (float_of_int l))
+		)
+	) s
+
+let print_animated = print_animatedf 0.5
+	
+
+let print_and_wait (s : string) = 
+	print_animated s;
+	read_line ()

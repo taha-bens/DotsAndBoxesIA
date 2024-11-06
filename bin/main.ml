@@ -12,63 +12,62 @@ open Dnb.Bots
 let (botList : bot list) = [stupid_bot]
 let get_bot_by_id = List.nth botList
 
-let rec get_input_dimensions () =
-	print_string "Choisissez les dimensions du plateau \"largeur,hauteur\" : ";
+let rec ask_input_dimensions (printed : bool) =
+	(if not printed then print_animated "Choisissez les dimensions du plateau \"largeur,hauteur\" : ");
 	let input = read_line () in
 	let dims = String.split_on_char ',' input in
 	if List.length dims <> 2 then
-		(print_endline "\nMauvaise saisie, réessayez";
-		get_input_dimensions ())
+		(print_animated "Mauvaise saisie, réessayez : ";
+		ask_input_dimensions true)
 	else
 		try 
 			let w = int_of_string (List.nth dims 0) in
 			let h = int_of_string (List.nth dims 1) in
 			if w < 2 || h < 2 then (
-				print_endline "Les dimensions doivent être supérieures à 1";
-				get_input_dimensions ()
+				print_animated "Les dimensions doivent être supérieures à 1, réessayez : ";
+				ask_input_dimensions true
 			)
 			else (w, h)
 		with _ ->
-			(print_endline "\nMauvaise saisie, réessayez";
-			get_input_dimensions ())
+			(print_animated "Mauvaise saisie, réessayez : ";
+			ask_input_dimensions true)
 
-let rec get_player_bot_numbers () = 
-	print_string "Choisissez le nombre de joueurs et de bots \"joueurs,bots,idBot1,...,idBotN\" : ";
+let rec ask_player_bot_numbers (printed : bool) = 
+	(if not printed then 
+		print_animated "Choisissez le nombre de joueurs et de bots \"joueurs,bots,idBot1,...,idBotN\" : ");
 	let input = read_line () in
 	try 
 		let numbers = List.map int_of_string (String.split_on_char ',' input) in
 		if List.for_all (fun v -> v >= 0) numbers && (List.length numbers) = 2 + (List.nth numbers 1) then
 			numbers
 		else 
-			(print_endline "\nMauvaise saisie, réessayez";
-			get_player_bot_numbers ())
+			(print_animated "Mauvaise saisie, réessayez : ";
+			ask_player_bot_numbers true)
 	with _ ->
-		(print_endline "\nMauvaise saisie, réessayez";
-		get_player_bot_numbers ())
+		(print_animated "Mauvaise saisie, réessayez : ";
+		ask_player_bot_numbers true)
 	
 
 (* Boucle principale du jeu *)
 let rec main_loop continue =
 	if continue then (
 		clear_and_print game_name;
-		print_string "'Entrer' pour lancer une partie : ";
-		let _ = read_line () in
+		let _ = print_and_wait "Appuyez sur 'Entrer' pour lancer la partie : " in
 		clear_terminal ();
 
-		let (w, h) = get_input_dimensions () in
+		let (w, h) = ask_input_dimensions false in
 		clear_terminal ();
-		let argv = get_player_bot_numbers () in
+		let argv = ask_player_bot_numbers false in
 		clear_terminal ();
 		let (nb_p, nb_b) = (List.nth argv 0, List.nth argv 1) in
 		let player_list = List.init (nb_p + nb_b) (fun i -> if i < nb_p then Player i else Bot(i, get_bot_by_id (List.nth argv (2 + i - nb_p)))) in
 		play_game w h player_list;
 
-		print_endline "Voulez-vous jouer à nouveau ? (o/n) :";
+		print_animated "Voulez-vous jouer à nouveau ? (o/n) :";
 		main_loop (match read_line () with
 		| "o" | "O" | "oui" | "Oui" -> true
 		| _ -> false)
 	)
-	else print_mess "Merci d'avoir joué ! \n" 
+	else print_animated "\nMerci d'avoir joué ! \n" 
 
-(* Début du programme *)
 let () = main_loop true

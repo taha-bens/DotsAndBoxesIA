@@ -130,15 +130,13 @@ let rec game_loop outcome =
 			let play = 
 				match gs.cur_player with
 				| Player _ -> 
-					(print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
+					(print_animated ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
 					get_player_play ())
+					(*(print_string ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
+					get_player_play ())*)
 				| Bot (id, b) -> 
-					(print_string ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
-					for _ = 0 to 10 do 
-						(print_char '.';
-						flush stdout;
-						Unix.sleepf 0.15)
-					done;
+					(print_animated ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
+					print_animatedf 1.5 "....................";
 					b (view gs))
 			in game_loop (act gs.cur_player play gs)
 		)
@@ -147,8 +145,8 @@ let rec game_loop outcome =
 
 let play_game (w: int) (h: int) (pl : player list) = 
 	match game_loop (Next (init_game_state w h pl)) with 
-	| None -> print_mess "Égalité !"
+	| None -> print_animated "Égalité !\n"
 	| Some x -> 
 		match x with
-		| Player id -> print_mess ("Le joueur "^ string_of_int id ^ " a gagné !")
-		| Bot (id,_) -> print_mess ("Le bot "^ string_of_int id ^ " a gagné !");
+		| Player id -> print_animated ("\nLe joueur "^ string_of_int id ^ " a gagné !")
+		| Bot (id,_) -> print_animated ("\nLe bot "^ string_of_int id ^ " a gagné !");
