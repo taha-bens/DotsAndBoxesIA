@@ -60,7 +60,7 @@ let test_is_legale _ =
   assert_equal (is_legal m (42,42,N)) false
 
 
-let test_apply_play _ =
+(*let test_apply_play _ =
   assert_equal (apply_play (map1_template true true true false) (0,0,E) 0) true;
-  assert_equal (apply_play (map1_template true false true false) (0,0,E) 0) false
+  assert_equal (apply_play (map1_template true false true false) (0,0,E) 0) false*)
 

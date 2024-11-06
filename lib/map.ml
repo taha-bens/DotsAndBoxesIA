@@ -272,14 +272,22 @@ let is_legal (m : map) (p : play) =
 	else
 		not (get_wall_val (get_cell i j m) s)
 
-(* Exécute un play, renvoie true si une case a été complétée *)
-(* TODO : compter le nombre de cases qui ont été complétées *)
+(* Exécute un play, renvoie le nombre de cases complétées *)
 let apply_play (m : map) (p : play) id =
+	let nb = ref 0 in
 	let (i, j, s) = p in
 	let c = get_cell i j m in
 	set_wall_val c s true;
-	if is_full_cell c then (set_ctype c (CompletedBy(id)); true)
-	else false
+	let side_neighbor =
+		match s with
+		| N -> if i > 0 then get_cell (i-1) j m else empty_cell ()
+		| O -> if j > 0 then get_cell i (j-1) m else empty_cell ()
+		| S -> if i < m.height-1 then get_cell (i+1) j m else empty_cell ()
+		| E -> if j < m.width-1 then get_cell i (j+1) m else empty_cell () 
+	in 
+	(if is_full_cell c then (set_ctype c (CompletedBy(id)); nb := !nb + 1));
+	(if is_full_cell side_neighbor then (set_ctype side_neighbor (CompletedBy(id)); nb := !nb + 1));
+	!nb
 
 let is_full (m : map) =
 	Array.for_all 

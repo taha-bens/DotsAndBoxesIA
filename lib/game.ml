@@ -29,8 +29,8 @@ let display (gv : game_view): unit = print_endline (Buffer.contents (buf_of_map 
 
 
 (* Getters/Setters --------------------------------------------------------- *)
-let update_score (score : int array) (id : int) = 
-	score.(id) <- score.(id) + 1
+let update_score (score : int array) (id : int) (v : int) = 
+	score.(id) <- score.(id) + v
 
 let get_player_id p = 
 	match p with
@@ -165,9 +165,9 @@ let act (p: player) (play : play) (gs: game_state) : outcome =
 	if is_legal gs.map play then
 		let id = get_player_id p in 
 		(* TODO : gérer le cas où deux cases sont complétées en même temps, éventuellement déplacer apply_play dans game *)
-		let box_completed = apply_play gs.map play id in
-		if box_completed then (
-			update_score gs.score id;
+		let completed_cells = apply_play gs.map play id
+		in if completed_cells > 0 then (
+			update_score gs.score id completed_cells;
 			if is_full gs.map then
 				Endgame (get_best_player gs)
 			else

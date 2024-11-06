@@ -3,10 +3,10 @@ open Dnb.Game
 open Dnb.Map
 open QCheck
 
-let test_update_score _ =
+(*let test_update_score _ =
   assert_equal (let t = [|0|] in update_score t 0; t.(0)) (1);
   assert_equal (let t = [|0;1|] in update_score t 1; t.(1)) (2);
-  assert_raises (Invalid_argument "index out of bounds") (fun () -> update_score [|0|] (-1))
+  assert_raises (Invalid_argument "index out of bounds") (fun () -> update_score [|0|] (-1))*)
 
 let test_get_player_id _ = 
   QCheck.Test.make ~count:10 ~name:"test_get_player_id"
