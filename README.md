@@ -2,6 +2,24 @@
 
 **Dots and Boxes** (ou ***Pipopipette***) est un jeu de stratégie inventé à la fin du XIX-ème siècle par des étudiants/mathématiciens français. Le principe est très simple : les cases d'une grille générée aléatoirement sont disputées par deux joueurs (traditionnellement, mais on peut jouer à autant qu'on veut pourvu que la grille soit assez grande). Ils posent chacun leur tour un mur sur la grille, et gagnent une case lorsqu'ils parviennent à placer le dernier de ses quatres murs. Le joueur ayant obtenu le plus de cases gagne la partie.
 
+
+
+## Règles du jeu:
+
+- Le jeu peut se jouer à **autant de personnes** que l'on souhaite.
+- Chaque joueur reçoit un **identifiant** entre 0 et le nombre de joueurs - 1.
+- Le jeu se joue sur une grille de cases carrées. Les joueurs jouent **chacun leur tour** en plaçant un mur sur la grille, ce qui définit le bord d'une case. 
+- Si un joueur **complète une case**, c'est-à-dire que ses quatre murs ont été placés, alors elle est marquée de l'identifiant du joueur et ce **dernier reçoit un point** et le **droit de rejouer**. 
+- Sinon, c'est au tour du prochain joueur de jouer. 
+- Certaines cases sont considérées comme **bloquées**, où l'on ne peut pas mettre de murs. Cela apporte plus de variété et de stratégie dans les parties. 
+- Le joueur ayant le **plus de points** lorsque la totalité de la grille est remplie gagne la partie.
+
+
+## Comment avons nous pensé à l'intégration des bots:
+
+Nous avons suivi toute l'API que les professeurs ont donné en classe (Voir `ModelAPI.md`).
+Un bot est donc une fonction de type `game_view -> play`. Selon nous cela représente donc une stratégie qu'un joueur applique lors de son tour. Ainsi pour implémenter un bot il vous suffit de crée une fonction de ce type et de la placer dans la liste 'botlist'. Il sera pris en compte par le prgramme et pourra être intégré à une partie. Une exemple de bot stupid est donné dans le fichier `Bot.ml`
+
 ## Getting started :
 
 #### Installer OPAM, OCaml et Dune  :
