@@ -16,6 +16,13 @@ Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
 - problème soulevé : Si l'on souhaite jouer avec une stratégie de bot (ex : id = 5) qui n'existe pas alors le programme crash.
 - résolution du problème : On vérifie que la stratégie demandée a bien un id compris dans la liste `botList`
 
+### Ticket #13
+- titre : "[Blokus Nidhal Mathéo] bon projet juste une erreur l'ors du lancement sans préciser sur le readme qu'il faut installer opam install qcheck-ounit"
+- auteur : MOUSSA nidhal  
+- problème soulevé : nom du ticket
+- résolution du problème : On a rajouter une ligne dans le README.md
+
+
 
 
 
