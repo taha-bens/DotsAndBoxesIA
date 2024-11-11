@@ -29,7 +29,11 @@ Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
 - résolution du problème : On a rajouter un exemple de coup que le programme attend
 
 
-
+### Ticket #7
+- titre : "Fatal Error when we just launch the game and enter on the input"
+- auteur : VIDAL nils  
+- problème soulevé : même que Ticket #8
+- résolution du problème : même que Ticket #8
 
 
 
