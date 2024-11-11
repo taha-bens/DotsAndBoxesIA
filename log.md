@@ -22,6 +22,15 @@ Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
 - problème soulevé : nom du ticket
 - résolution du problème : On a rajouter une ligne dans le README.md
 
+### Ticket #11
+- titre : "confusions sur le format pour entrer les coordonnées, nombres de joueurs, etc.."
+- auteur : BENSAAD taha  
+- problème soulevé : système de coordonnées peu clair
+- résolution du problème : On a rajouter un exemple de coup que le programme attend
+
+
+
+
 
 
 
