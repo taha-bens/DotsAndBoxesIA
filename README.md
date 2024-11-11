@@ -65,6 +65,8 @@ dune runtest
 ./launcher.sh t
 ```
 
+Assurez vous d'avoir les bibliothèques suivantes : ounit2 qcheck qcheck-ounit
+
 **Attention :** si on lance la commande `dune runtest` et que les tests sont validés, alors un deuxième `dune runtest` ne produira aucun résultat sur la sortie standard. Par défault Dune ne relance pas les tests s'ils ont déjà été validés et que le code n'a pas été modifié.
 
 #### Fichiers de configuration :
