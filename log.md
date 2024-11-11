@@ -35,6 +35,11 @@ Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
 - problème soulevé : même que Ticket #8
 - résolution du problème : même que Ticket #8
 
+### Ticket #9
+- titre : "Give example of valid entries for the user to avoid confusion"
+- auteur : BENMEZIANE yacine
+- problème soulevé : même que Ticket #11
+- résolution du problème : même que Ticket #11
 
 
 
