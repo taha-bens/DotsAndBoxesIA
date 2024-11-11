@@ -42,7 +42,10 @@ Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
 - résolution du problème : même que Ticket #11
 
 
-
-
+### Ticket #10
+- titre : "interrupt user input during animation"
+- auteur : BENMEZIANE yacine
+- problème soulevé : On peut écrire quelque chose durant l'animation
+- résolution du problème : désactivation du mode echo du terminal durant l'animation
 
 
