@@ -38,7 +38,9 @@ let rec ask_user_nb_players (printed : bool) =
 	let input = read_line () in
 	try 
 		let numbers = List.map int_of_string (String.split_on_char ',' input) in
-		if List.for_all (fun v -> v >= 0) numbers && (List.length numbers) = 2 + (List.nth numbers 1) then
+		if List.for_all (fun v -> v >= 0) numbers 
+			&& (List.length numbers) = 2 + (List.nth numbers 1) 
+			&& ((let botlen = List.length botList in List.for_all (fun v -> botlen > v) (List.tl (List.tl numbers)))) then
 			numbers
 		else 
 			(print_animated "Mauvaise saisie, réessayez : ";
