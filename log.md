@@ -3,10 +3,18 @@
 ## Projet des autres
 
 ### projet Caracsonne :
-  Ticket : Manque d'explication sur le visuel des tuiles
+- Ticket :# 11 Manque d'explication sur le visuel des tuiles
+- Ticket : #18 [From DotAndBoxes] Les noms de joueurs peuvent être vide
 
 ### projet Unipoly
-Ticket : [From:DotsAndBoxes] Fatal error: exception End_of_file
+- Ticket : #27 [From:DotsAndBoxes] Fatal error: exception End_of_file
+
+### quoridor-ocaml :
+- Ticket : #32 [From DotAndBoxes] Unbound value Array.init_matrix 
+
+### Santorini :
+- Ticket : #23 [From DotAndBoxes] Une erreur lors d'une mauvaise saisie 
+- MR : !17 Merge request pour la correction de l'erreur de saisie lors du choix des positions (cf Ticket #23) 
 
 ## Notre projet
 
