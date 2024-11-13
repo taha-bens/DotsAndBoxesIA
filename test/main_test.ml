@@ -22,11 +22,17 @@ let () =
     
 
     (* tests game module *)
-    (*"test_update_score" >:: test_update_score;*)
     "test_play_of_string" >:: test_play_of_string;
+    "test_get_next_player" >:: test_get_next_player;
+    "test_get_best_player" >:: test_get_best_player;
+    "test_int_of_letters" >:: test_int_of_letters;
+    "test_play_of_string" >:: test_play_of_string;
+    "test_string_of_play" >:: test_string_of_play;
+    "test_act1" >:: test_act1;
+    "test_act2" >:: test_act2;
+    "test_init_game_state" >:: test_init_game_state;
 
-    "test_act" >:: test_act;
-
-    QCheck_ounit.to_ounit2_test (test_get_player_id ()); 
+    QCheck_ounit.to_ounit2_test prop_get_player_id; 
+    QCheck_ounit.to_ounit2_test prop_get_next_player; 
 
   ] in run_test_tt_main sequence
