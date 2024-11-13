@@ -65,6 +65,7 @@ let box_grid grid =
 let print_grid grid = clear_and_print (box_grid grid)	
 
 let print_animatedf (duration : float) (s : string) =
+  let _ = Sys.command "stty -echo" in
 	let l = String.length s in
 	String.iter (
 		fun c -> (
@@ -72,7 +73,9 @@ let print_animatedf (duration : float) (s : string) =
 			flush stdout;
 			Unix.sleepf (duration /. (float_of_int l))
 		)
-	) s
+	) s;
+	let _ = Sys.command "stty echo" in ()
+
 
 let print_animated = print_animatedf 0.5
 	
