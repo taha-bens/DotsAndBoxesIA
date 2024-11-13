@@ -11,10 +11,13 @@ let () =
     "test_convert_to_block" >:: test_convert_to_block;
     "test_is_full" >:: test_is_full;
     "test_is_legale" >:: test_is_legale;
-    (*"test_apply_play" >:: test_apply_play;*)
-
+    "test_empty_map" >:: test_empty_map;
+    "test_random_map" >:: test_random_map;
+    "test_perlin_map" >:: test_perlin_map;
+    
     QCheck_ounit.to_ounit2_test (test_maps_equal random_map_gen); 
     QCheck_ounit.to_ounit2_test (test_maps_equal perlin_map_gen); 
+    QCheck_ounit.to_ounit2_test prop_map_dimensions; 
 
     
 

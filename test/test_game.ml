@@ -17,8 +17,8 @@ let test_get_player_id _ =
 let test_play_of_string _ = 
   assert_equal (play_of_string "A0N") (0,0,N);
   assert_equal (play_of_string "E4O") (4,4,O);
-  assert_equal (play_of_string "A0Nizefoie") (0,0,N);
-  assert_raises (Invalid_argument "error side") (fun () -> play_of_string "osejfpzqejf^")
+  assert_raises (Invalid_argument "error play format1") (fun () -> play_of_string "osejfpzqejf^");
+  assert_raises (Invalid_argument "error play format2") (fun () -> play_of_string "A0Nizefoie")
 
 
 (* très compliqué à tester car chaque partie est unique et indépendante *)
