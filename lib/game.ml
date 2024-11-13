@@ -197,7 +197,7 @@ let rec game_loop outcome prev_gs =
 		let play = 
 			match gs.cur_player with
 			| Player _ -> 
-				(print_animated ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup : ");
+				(print_animated ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup (ex : A0N 'case de coordonnées (A,0), murs Nord'): ");
 				get_player_play ())
 			| Bot (id, bot) -> 
 				(print_animated ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
