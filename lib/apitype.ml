@@ -1,5 +1,4 @@
 
-
 type side = N | O | S | E
 type celltype = Void | Block | CompletedBy of int
 type 'a grid = 'a array array

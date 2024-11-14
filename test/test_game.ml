@@ -1,6 +1,9 @@
 open Dnb.Game
 open Dnb.Apitype
 open Dnb.Map
+open Dnb.Player
+open Dnb.Gamestate
+open Dnb.Utils
 open OUnit2
 open QCheck
 

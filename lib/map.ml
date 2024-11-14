@@ -1,5 +1,6 @@
 open Perlin
 open Apitype
+open Utils
 
 (* Ce module permet de modéliser le plateau de jeu. Il contient des        
  * fonctions de génération de map, des fonctions permettant la manipulation d'une 
@@ -13,8 +14,6 @@ open Apitype
 * map (c'est-à-dire s'assuer de la présence ou non d'un même mur sur deux  
 * cases adjacentes), les murs sont représentés par des ref bool, et deux    
 * cases adjacentes partagent un même mur. *)
-
-
 
 (* Fonctions d'égalités pour les types qu'on a défini ---------------------- *)
 let grids_equal (arr1 : 'a grid) (arr2 : 'a grid) (f : 'a -> 'a -> bool) = 
@@ -32,26 +31,6 @@ let maps_equal m1 m2 =
 
 
 (* Getters/Setters --------------------------------------------------------- *)
-let side_of_int i =
-	match i with 
-	| 0 -> N
-	| 1 -> O
-	| 2 -> S
-	| _ -> E (* Bof, bof... *)
-
-let int_of_side s =
-	match s with
-	| N -> 0
-	| O -> 1
-	| S -> 2
-	| E -> 3
-
-let string_of_side s =
-	match s with
-	| N -> "N"
-	| O -> "O"
-	| S -> "S"
-	| E -> "E"
 
 let get_cell i j m = m.content.(i).(j)
 					
@@ -142,14 +121,6 @@ let get_unwalled_side (c : cell) : side option =
 	else if not (get_wall_val c O) then Some(O)
 	else if not (get_wall_val c S) then Some(S)
 	else Some(E)
-
-(* Convertit un entier en une chaine de caractères de la forme [A-Z]+
- * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
-let letters_of_int (i : int) =
-	let rec aux i acc = 
-		if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
-	else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
-	in String.concat "" (aux i [])
 
 
 (* Fonctions de génération de map ------------------------------------------ *)
@@ -253,7 +224,6 @@ let buf_of_line line (m : map) =
 		else buf1
 	
 let buf_of_map (m : map) =
-	(* dégueu *)
 	let buf = Buffer.create ((3 * m.height + 1) * (6 + 7 * m.width + 1 + 1)) in
 	for i = -1 to m.height-1 do
 		Buffer.add_buffer buf (buf_of_line i m);

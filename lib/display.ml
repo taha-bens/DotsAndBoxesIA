@@ -1,5 +1,4 @@
 (* Module gérant l'affichage de jeu sur le terminal *)
-
 let game_name = 
 	" _____          _                               _   ____                             \n"^
 	"|  __ \\        | |            /\\               | | |  _ \\                            \n"^
@@ -79,7 +78,6 @@ let print_animatedf (duration : float) (s : string) =
 
 let print_animated = print_animatedf 0.5
 	
-
 let print_and_wait (s : string) = 
 	print_animated s;
 	read_line ()
