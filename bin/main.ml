@@ -54,7 +54,7 @@ let rec ask_user_nb_players (printed : bool) =
 (* Boucle principale du jeu *)
 let rec main_loop continue =
 	if continue then (
-		clear_and_print game_name;
+		print_game_name ();
 		let _ = print_and_wait "Appuyez sur 'Entrer' pour lancer la partie : " in
 		clear_terminal ();
 

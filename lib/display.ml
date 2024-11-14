@@ -16,17 +16,11 @@ let clear_terminal () =
 	else
 		Printf.printf "\027[2J\027[H"
 
-let box_string str =
-	let len = String.length str in
-	let top_bottom = String.make (len + 4) '-' in
-	let middle = "| " ^ str ^ " |" in
-	top_bottom ^ "\n" ^ middle ^ "\n" ^ top_bottom
-
 let clear_and_print message = 
 	clear_terminal (); 
 	print_endline message
 
-let print_mess (s :string) = clear_and_print (box_string s)
+let print_game_name () = clear_and_print game_name
 
 let box_grid grid =
 	(* Fonction auxiliaire pour trouver la largeur maximale d'une colonne *)
@@ -62,8 +56,6 @@ let box_grid grid =
 			) grid)) ^
 		"\n" ^ h_line
 
-let print_grid grid = clear_and_print (box_grid grid)	
-
 let print_animatedf (duration : float) (s : string) =
   let _ = Sys.command "stty -echo" in
 	let l = String.length s in
@@ -75,7 +67,6 @@ let print_animatedf (duration : float) (s : string) =
 		)
 	) s;
 	let _ = Sys.command "stty echo" in ()
-
 
 let print_animated = print_animatedf 0.5
 	
