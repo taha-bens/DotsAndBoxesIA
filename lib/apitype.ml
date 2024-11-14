@@ -1,4 +1,5 @@
 
+(* Implémentation de tout les types du projet *)
 type side = N | O | S | E
 type celltype = Void | Block | CompletedBy of int
 type 'a grid = 'a array array

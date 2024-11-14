@@ -6,7 +6,6 @@ open Apitype
  * pour qu'elle puisse être utilisée en partie.
  *)
 
- 
 (* Exemple de bot stupid *)
 let stupid_bot : bot =
 	fun (gv : game_view) ->

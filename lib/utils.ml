@@ -2,27 +2,12 @@ open Apitype
 
 
 (* Fonctions utilitaires --------------------------------------------------- *)	  
-let side_of_int i =
-	match i with 
-	| 0 -> N
-	| 1 -> O
-	| 2 -> S
-	| _ -> E (* Bof, bof... *)
+let side_of_int = function 0 -> N | 1 -> O | 2 -> S | _ -> E
+let int_of_side = function N -> 0 | O -> 1 | S -> 2 | E -> 3
+let string_of_side = function N -> "N" | O -> "O" | S -> "S" | E -> "E"
 
-let int_of_side s =
-	match s with
-	| N -> 0
-	| O -> 1
-	| S -> 2
-	| E -> 3
-
-let string_of_side s =
-	match s with
-	| N -> "N"
-	| O -> "O"
-	| S -> "S"
-	| E -> "E"
-
+(* Renvoie la ième+1 lettre de l'alphabet
+  0 -> A , 1 -> B *)
 let int_of_letters (s : string) = 
 	let i = ref 0 in 
 	let len = String.length s in
@@ -71,6 +56,4 @@ let play_of_string s =
 			| _ -> raise (Invalid_argument "error side")
 		in (int_of_letters s1, int_of_string s2, s3)
 
-let string_of_play (p : play) =
-	let (i, j, s) = p in
-	(letters_of_int i) ^ " " ^ (string_of_int j) ^ " " ^ (string_of_side s)
+let string_of_play (p : play) = let (i, j, s) = p in (letters_of_int i) ^ " " ^ (string_of_int j) ^ " " ^ (string_of_side s)

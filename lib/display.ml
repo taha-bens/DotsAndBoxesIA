@@ -1,3 +1,4 @@
+
 (* Module gérant l'affichage de jeu sur le terminal *)
 let game_name = 
 	" _____          _                               _   ____                             \n"^

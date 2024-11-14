@@ -21,6 +21,4 @@ let print_game_state (gs : game_state) =
 	print_endline "";
 	print_endline(Buffer.contents (buf_of_map gs.map))
 
-let refresh_display (gs : game_state) =
-	clear_terminal ();
-	print_game_state gs
+let refresh_display (gs : game_state) = clear_terminal (); print_game_state gs
