@@ -1,4 +1,5 @@
 open Perlin
+open Apitype
 
 (* Ce module permet de modéliser le plateau de jeu. Il contient des        
  * fonctions de génération de map, des fonctions permettant la manipulation d'une 
@@ -12,13 +13,7 @@ open Perlin
 * map (c'est-à-dire s'assuer de la présence ou non d'un même mur sur deux  
 * cases adjacentes), les murs sont représentés par des ref bool, et deux    
 * cases adjacentes partagent un même mur. *)
-type side = N | O | S | E
-type celltype = Void | Block | CompletedBy of int
-type 'a grid = 'a array array
-type cell = {walls: bool ref array; mutable ctype:celltype} (*N O S E*)
-type map = {width:int; height:int; content: cell grid}
-type play = int * int * side
-exception MapException of string
+
 
 
 (* Fonctions d'égalités pour les types qu'on a défini ---------------------- *)

@@ -1,6 +1,7 @@
 open Dnb.Game
 open Dnb.Display
 open Dnb.Bots
+open Dnb.Apitype
 
 (* Module pricipal du programme qui gère les premières interactions
  * et le lancement de la partie.

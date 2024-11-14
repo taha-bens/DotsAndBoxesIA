@@ -1,5 +1,5 @@
-open Game
 open Map
+open Apitype
 
 (* Module pour les "stratégies" des bots.
  * Chaque stratégie conçu doit être renseignée dans botList (main.ml) 

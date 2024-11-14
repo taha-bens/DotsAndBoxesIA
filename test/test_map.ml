@@ -1,6 +1,7 @@
 open OUnit2
-open Dnb.Map
 open QCheck
+open Dnb.Map
+open Dnb.Apitype
 
 
 (* map d'une seule cellule *)

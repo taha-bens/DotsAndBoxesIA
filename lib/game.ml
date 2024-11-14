@@ -1,5 +1,6 @@
 open Map
 open Display
+open Apitype
 
 
 (* Ce module permet de gérer le déroulement d'une partie
@@ -10,20 +11,7 @@ open Display
 *)
 
 (* Types et exceptions ----------------------------------------------------- *)
-type game_view = map
-type bot = game_view -> play
-type player = 
-| Player of int 
-| Bot of int * bot
-type game_state = {
-	score : int array; 
-	player_list : player list; 
-	cur_player : player; 
-	map : map }
-type outcome = 
-| Next of game_state
-| Error of (player * string)
-| Endgame of player option
+
 let view (gs : game_state) : game_view = copy_map gs.map
 let display (gv : game_view): unit = print_endline (Buffer.contents (buf_of_map gv))
 
