@@ -1,4 +1,6 @@
 open Perlin
+open Apitype
+open Utils
 
 (* Ce module permet de modéliser le plateau de jeu. Il contient des        
  * fonctions de génération de map, des fonctions permettant la manipulation d'une 
@@ -12,59 +14,26 @@ open Perlin
 * map (c'est-à-dire s'assuer de la présence ou non d'un même mur sur deux  
 * cases adjacentes), les murs sont représentés par des ref bool, et deux    
 * cases adjacentes partagent un même mur. *)
-type side = N | O | S | E
-type celltype = Void | Block | CompletedBy of int
-type 'a grid = 'a array array
-type cell = {walls: bool ref array; mutable ctype:celltype} (*N O S E*)
-type map = {width:int; height:int; content: cell grid}
-type play = int * int * side
-exception MapException of string
-
 
 (* Fonctions d'égalités pour les types qu'on a défini ---------------------- *)
 let grids_equal (arr1 : 'a grid) (arr2 : 'a grid) (f : 'a -> 'a -> bool) = 
 	try
-	Array.for_all2 
-		(fun s_arr1 s_arr2 -> Array.for_all2 f s_arr1 s_arr2)
-		arr1 arr2
+	Array.for_all2 (fun s_arr1 s_arr2 -> Array.for_all2 f s_arr1 s_arr2) arr1 arr2
 	with _ -> false
 
-let cells_equal c1 c2 = 
-	(Array.for_all2 (fun s1 s2 -> s1 = s2) c1.walls c2.walls) && (c1.ctype = c2.ctype)
+let cells_equal c1 c2 = (Array.for_all2 (fun s1 s2 -> s1 = s2) c1.walls c2.walls) && (c1.ctype = c2.ctype)
 
-let maps_equal m1 m2 = 
-	grids_equal m1.content m2.content
+let maps_equal m1 m2 = grids_equal m1.content m2.content
 
 
 (* Getters/Setters --------------------------------------------------------- *)
-let side_of_int i =
-	match i with 
-	| 0 -> N
-	| 1 -> O
-	| 2 -> S
-	| _ -> E (* Bof, bof... *)
-
-let int_of_side s =
-	match s with
-	| N -> 0
-	| O -> 1
-	| S -> 2
-	| E -> 3
-
-let string_of_side s =
-	match s with
-	| N -> "N"
-	| O -> "O"
-	| S -> "S"
-	| E -> "E"
 
 let get_cell i j m = m.content.(i).(j)
 					
 let get_walls (c : cell) = c.walls 
 	
 (* Renvoie la référence du mur *)
-let get_wall (c : cell) (s : side) =
-	c.walls.(int_of_side s)
+let get_wall (c : cell) (s : side) = c.walls.(int_of_side s)
 		
 (* Renvoie la valeur du mur *)
 let get_wall_val (c : cell) (s : side) = !(get_wall c s)
@@ -74,22 +43,19 @@ let set_wall_val (c : cell) (s : side) value = (get_wall c s) := value
 (* On ne peut pas utiliser la fonction get_wall ici
 * car le résultat de get_wall est une valeur et pas
 * une variable modifiable. *)
-let set_wall_ref (c : cell) (s : side) bool_ref =
-	c.walls.(int_of_side s) <- bool_ref
+let set_wall_ref (c : cell) (s : side) bool_ref = c.walls.(int_of_side s) <- bool_ref
 
 let get_ctype (c : cell) = c.ctype
 
-let set_ctype (c : cell) value = 
-	c.ctype <- value
+let set_ctype (c : cell) value = c.ctype <- value
 
 
 (* Fonctions utilitaires --------------------------------------------------- *)
-let is_full_cell (c : cell) =
-	Array.for_all (fun (w : bool ref) -> !w) c.walls
+let is_full_cell (c : cell) = Array.for_all (fun (w : bool ref) -> !w) c.walls
+
+let is_full (m : map) = Array.for_all (fun s_arr -> Array.for_all (fun c -> is_full_cell c) s_arr) m.content
 	
-let convert_to_block (c : cell) =
-	Array.iter (fun w -> w := true) c.walls;
-	set_ctype c Block
+let convert_to_block (c : cell) = Array.iter (fun w -> w := true) c.walls; set_ctype c Block
 	
 let empty_cell () = {walls=Array.init 4 (fun _ -> ref false); ctype=Void}
 	
@@ -147,14 +113,6 @@ let get_unwalled_side (c : cell) : side option =
 	else if not (get_wall_val c O) then Some(O)
 	else if not (get_wall_val c S) then Some(S)
 	else Some(E)
-
-(* Convertit un entier en une chaine de caractères de la forme [A-Z]+
- * Par exemple : 0 -> "A", 25 -> "Z", 26 -> "AA", 27 -> "AB" etc...*)
-let letters_of_int (i : int) =
-	let rec aux i acc = 
-		if i < 26 then (Char.escaped (Char.chr (i + Char.code 'A'))) :: acc
-	else aux (i / 26 - 1) ((Char.escaped (Char.chr (i mod 26 + Char.code 'A'))) :: acc)
-	in String.concat "" (aux i [])
 
 
 (* Fonctions de génération de map ------------------------------------------ *)
@@ -258,7 +216,6 @@ let buf_of_line line (m : map) =
 		else buf1
 	
 let buf_of_map (m : map) =
-	(* dégueu *)
 	let buf = Buffer.create ((3 * m.height + 1) * (6 + 7 * m.width + 1 + 1)) in
 	for i = -1 to m.height-1 do
 		Buffer.add_buffer buf (buf_of_line i m);
@@ -288,9 +245,3 @@ let apply_play (m : map) (p : play) id =
 	(if is_full_cell c then (set_ctype c (CompletedBy(id)); nb := !nb + 1));
 	(if is_full_cell side_neighbor then (set_ctype side_neighbor (CompletedBy(id)); nb := !nb + 1));
 	!nb
-
-let is_full (m : map) =
-	Array.for_all 
-		(fun s_arr -> Array.for_all 
-			(fun c -> is_full_cell c) s_arr) 
-	m.content
