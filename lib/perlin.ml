@@ -36,11 +36,11 @@ let perlin_noise_grid w h scale =
 	let gradients = generate_gradients w h in 
 	Array.init h (fun i -> Array.init w (fun j -> perlin_noise ((float_of_int i)/.scale) ((float_of_int j)/.scale) gradients))
 
-let round (t : float) = 
-	if t -. floor t < 0.5 then floor t else ceil t
+(*let round (t : float) = 
+	if t -. floor t < 0.5 then floor t else ceil t*)
 
-let bool_of_float t = 
-	if t > 0. then true else false
+(*let bool_of_float t = 
+	if t > 0. then true else false*)
 
 let perlin_noise_grid_bool w h s = 
 	Array.map (fun arr -> Array.map (fun v -> v > 0.) arr) (perlin_noise_grid w h s) 

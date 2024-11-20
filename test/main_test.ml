@@ -1,6 +1,7 @@
 open OUnit2
 open Test_game
 open Test_map
+open Test_perlin
 
 let () = 
   let sequence = "test sequence" >::: [
@@ -34,5 +35,14 @@ let () =
 
     QCheck_ounit.to_ounit2_test prop_get_player_id; 
     QCheck_ounit.to_ounit2_test prop_get_next_player; 
+    
+    (* tests module perlin *)
+    "test_fade" >:: test_fade;
+    "test_lin_interp" >:: test_lin_interp;
+    "test_generate_gradients" >:: test_generate_gradients;
+    "test_dot_product_grad" >:: test_dot_product_grad;
+    "test_perlin_noise" >:: test_perlin_noise;
+    "test_perlin_noise_grid" >:: test_perlin_noise_grid;
+    "test_perlin_noise_grid_bool" >:: test_perlin_noise_grid_bool;
 
   ] in run_test_tt_main sequence
