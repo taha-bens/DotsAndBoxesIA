@@ -13,7 +13,6 @@ open Utils
 *)
 
 let view (gs : game_state) : game_view = copy_map gs.map
-let display (gv : game_view): unit = print_endline (Buffer.contents (buf_of_map gv))
 let update_score (score : int array) (id : int) (v : int) = score.(id) <- score.(id) + v
 
 (* Vérifie que le coup est valide puis l'applique *)
