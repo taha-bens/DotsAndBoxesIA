@@ -16,6 +16,12 @@
 - Ticket : #23 [From DotAndBoxes] Une erreur lors d'une mauvaise saisie 
 - MR : !17 Merge request pour la correction de l'erreur de saisie lors du choix des positions (cf Ticket #23) 
 
+### Abalone :
+- Ticket : #25 [From:DotsAndBoxes] Fatal error lors d'une partie
+
+### Blokus :
+- Ticket : #25 [From:DotsAndBoxes] Clignotement
+
 ## Notre projet
 
 ### Ticket #8 
