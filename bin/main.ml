@@ -35,7 +35,7 @@ let rec ask_user_dimensions (printed : bool) =
 
 let rec ask_user_nb_players (printed : bool) = 
 	(if not printed then 
-		print_animated "Choisissez le nombre de joueurs et de bots \"joueurs,bots,idBot1,...,idBotN\" : ");
+		print_animated "Choisissez le nombre de joueurs et de bots \"nombre de joueurs,nombre de bots,idBot1,...,idBotN\" : ");
 	let input = read_line () in
 	try 
 		let numbers = List.map int_of_string (String.split_on_char ',' input) in

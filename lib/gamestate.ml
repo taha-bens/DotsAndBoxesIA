@@ -7,7 +7,7 @@ let init_game_state (w: int) (h:int) (pl :player list) =
 	{score = Array.make (List.length pl) 0;
 	player_list = pl; 
 	cur_player = List.nth pl 0; 
-	map = random_map w h} 
+	map = if Random.bool () then perlin_map w h else random_map w h} 
 
 let print_game_state (gs : game_state) = 
 	let pl = gs.player_list in 
