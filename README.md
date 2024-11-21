@@ -14,11 +14,13 @@
 - Certaines cases sont considérées comme **bloquées**, où l'on ne peut pas mettre de murs. Cela apporte plus de variété et de stratégie dans les parties. 
 - Le joueur ayant le **plus de points** lorsque la totalité de la grille est remplie gagne la partie.
 
+cf : https://en.wikipedia.org/wiki/Dots_and_boxes
+
 
 ## Comment avons nous pensé à l'intégration des bots:
 
-Nous avons suivi toute l'API que les professeurs ont donné en classe (Voir `ModelAPI.md`).
-Un bot est donc une fonction de type `game_view -> play`. Selon nous cela représente donc une stratégie qu'un joueur applique lors de son tour. Ainsi pour implémenter un bot il vous suffit de crée une fonction de ce type et de la placer dans la liste 'botlist'. Il sera pris en compte par le prgramme et pourra être intégré à une partie. Une exemple de bot stupid est donné dans le fichier `Bot.ml`
+Nous avons suivi toute l'API que les professeurs ont donné en classe (Voir `ModelAPI.md` et APItype.ml).
+Un bot est donc une fonction de type `game_view -> play`. Selon nous cela représente donc une stratégie qu'un joueur applique lors de son tour. Ainsi, pour implémenter un bot il vous suffit de crée une fonction de ce type et de la placer dans la liste `botlist` qui se trouve dans le fichier `main.ml`. Il sera pris en compte par le programme et pourra être intégré à une partie. Un exemple de bot stupid est donné dans le fichier `Bot.ml`
 
 ## Getting started :
 
