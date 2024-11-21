@@ -73,4 +73,6 @@ let rec main_loop continue =
 	)
 	else print_animated "\nMerci d'avoir joué ! \n" 
 
-let () = main_loop true
+let () = 
+	Random.self_init();
+	main_loop true
