@@ -12,7 +12,7 @@ open Utils
  * act : applique le coup spécifique d'un joueur sur l'état du jeu
 *)
 
-let view (gs : game_state) : game_view = copy_map gs.map
+let view (id : int) (gs : game_state) : game_view = (id, Array.to_list gs.score, copy_map gs.map)
 let update_score (score : int array) (id : int) (v : int) = score.(id) <- score.(id) + v
 
 (* Vérifie que le coup est valide puis l'applique *)
@@ -52,7 +52,7 @@ let rec game_loop outcome prev_gs =
 			| Bot (id, bot) -> 
 				(print_animated ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
 				print_animatedf 0.1 "....................";
-				bot (view gs))
+				bot (view id gs))
 		in let result = act gs.cur_player play gs in
 		game_loop result gs)
 	| Error (player, s) -> (
@@ -70,7 +70,7 @@ let rec game_loop outcome prev_gs =
 let play_game (w: int) (h: int) (pl : player list) = 
 	let gs = init_game_state w h pl in
 	refresh_display gs;
-	match game_loop (Next gs) gs with 
+	match let out = game_loop (Next gs) gs in refresh_display gs; out with 
 	| None -> print_animated "Fin de partie, personne n'a gagné !\n"
 	| Some x -> 
 		match x with

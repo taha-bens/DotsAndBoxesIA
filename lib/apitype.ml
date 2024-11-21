@@ -7,7 +7,8 @@ type map = {width:int; height:int; content: cell grid}
 type play = int * int * side
 
 
-type game_view = map
+
+type game_view = int * int list * map
 type bot = game_view -> play
 type player = 
 | Player of int 
