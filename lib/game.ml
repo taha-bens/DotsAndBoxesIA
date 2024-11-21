@@ -19,7 +19,6 @@ let update_score (score : int array) (id : int) (v : int) = score.(id) <- score.
 let act (p: player) (play : play) (gs: game_state) : outcome = 
 	if is_legal gs.map play then
 		let id = get_player_id p in 
-		(* TODO : gérer le cas où deux cases sont complétées en même temps, éventuellement déplacer apply_play dans game *)
 		let completed_cells = apply_play gs.map play id
 		in if completed_cells > 0 then (
 			update_score gs.score id completed_cells;
@@ -44,18 +43,17 @@ let act (p: player) (play : play) (gs: game_state) : outcome =
 
 let rec game_loop outcome prev_gs = 
 	match outcome with
-	| Next gs -> (
+	| Next gs -> (refresh_display gs;
 		let play = 
 			match gs.cur_player with
-			| Player _ -> 
-				(print_animated ("Joueur " ^ (string_of_player gs.cur_player) ^ ", entrez un coup (ex : A0N 'case de coordonnées (A,0), murs Nord'): ");
+			| Player id -> 
+				(print_animated ("Joueur " ^ (string_of_int id) ^ ", entrez un coup (ex : A0N 'case de coordonnées (A,0), murs Nord'): ");
 				get_player_play ())
 			| Bot (id, bot) -> 
 				(print_animated ("Le bot " ^ (string_of_int id) ^ " est en train de jouer");
 				print_animatedf 0.1 "....................";
 				bot (view gs))
 		in let result = act gs.cur_player play gs in
-		refresh_display gs;
 		game_loop result gs)
 	| Error (player, s) -> (
 		match player with
