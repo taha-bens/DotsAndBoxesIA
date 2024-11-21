@@ -1,0 +1,62 @@
+stages:
+  - build
+  - test
+
+
+default:
+  image: ocaml/opam:debian-12-opam
+  before_script:
+    # Fonctions pour créer des menus dépliant dans les rapports gitlab
+    - header_start () { echo -e "section_start:`date +%s`:${1}\r\e[0K\e[93m${2}\e[0m"; }
+    - header_end () { echo -e "section_end:`date +%s`:${1}\r\e[0K"; }
+
+
+build:
+  stage: build
+
+  cache:
+    paths:
+      - _opam
+      - _build
+
+  script:
+    # Setup de l'environnement (switch opam et dépendances)
+    - if [ -d _opam ]; then echo "Dossier _opam existe, rien à installer"; fi
+    - >
+      if [ ! -d _opam ]; then
+        echo "Pas de dossier _opam, création d'un switch"
+        header_start init_env "Création du switch opam"
+        opam update
+        opam switch create --yes --deps-only --with-test --with-doc . 5.2.0
+        header_end init_env
+      fi
+    # Build
+    - header_start build "Build le projet"
+    - eval $(opam env)
+    - dune build @all
+    - header_end build
+
+
+test:
+  stage: test
+
+  cache:
+    paths:
+      - _opam
+      - _build
+    policy: pull
+
+  artifacts:
+    paths:
+      - _coverage
+
+  coverage: '/\(\d+\.\d+%\)/'
+
+  script:
+    - header_start tests "Executer les tests"
+    - eval $(opam env)
+    - dune test -f &> /dev/null
+    - dune test --instrument-with bisect_ppx --force
+    - bisect-ppx-report html
+    - bisect-ppx-report summary
+    - header_end tests
