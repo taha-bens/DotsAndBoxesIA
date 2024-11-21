@@ -27,13 +27,13 @@ build:
         echo "Pas de dossier _opam, création d'un switch"
         header_start init_env "Création du switch opam"
         opam update
-        opam switch create --yes --deps-only --with-test --with-doc . 5.2.0
+        opam switch create --yes --deps-only . 5.2.0
         header_end init_env
       fi
     # Build
     - header_start build "Build le projet"
     - eval $(opam env)
-    - dune build @all
+    - dune build
     - header_end build
 
 
@@ -46,17 +46,8 @@ test:
       - _build
     policy: pull
 
-  artifacts:
-    paths:
-      - _coverage
-
-  coverage: '/\(\d+\.\d+%\)/'
-
   script:
     - header_start tests "Executer les tests"
     - eval $(opam env)
-    - dune test -f &> /dev/null
-    - dune test --instrument-with bisect_ppx --force
-    - bisect-ppx-report html
-    - bisect-ppx-report summary
+    - dune test -f
     - header_end tests
