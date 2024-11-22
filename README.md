@@ -22,6 +22,8 @@ cf : https://en.wikipedia.org/wiki/Dots_and_boxes
 Nous avons suivi toute l'API que les professeurs ont donné en classe (Voir `ModelAPI.md` et APItype.ml).
 Un bot est donc une fonction de type `game_view -> play`. Selon nous cela représente donc une stratégie qu'un joueur applique lors de son tour. Ainsi, pour implémenter un bot il vous suffit de crée une fonction de ce type et de la placer dans la liste `botlist` qui se trouve dans le fichier `main.ml`. Il sera pris en compte par le programme et pourra être intégré à une partie. Un exemple de bot stupid est donné dans le fichier `Bot.ml`
 
+Attention ! Changement du type `game_view` ```type game_view = int * int list * map (* (id, score, map) *)``` 
+
 ## Getting started :
 
 #### Installer OPAM, OCaml et Dune  :
